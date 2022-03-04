@@ -3,6 +3,7 @@ FlavNET
 """
 import torch
 import numpy as np
+import os
 
 import torch
 import torch.nn as nn
@@ -14,13 +15,14 @@ import matplotlib.pyplot as plt
 
 import torchvision.transforms as transforms
 import torchvision.models as models
+from torchvision.utils import save_image
 
 import copy
 
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 # desired size of the output image
-imsize = 512 if torch.cuda.is_available() else 128  # use small size if no gpu
+imsize = 512 if torch.cuda.is_available() else 256  # use small size if no gpu
 
 loader = transforms.Compose([
     transforms.Resize(imsize),  # scale imported image
@@ -33,10 +35,14 @@ def image_loader(image_name):
     image = loader(image).unsqueeze(0)
     return image.to(device, torch.float)
 
+#_______.
+#_INPUT_|
+style_file_name = "emma.jpg"
+content_file_name = "emma.jpg"
+#_______|
+style_img = image_loader("./images/{}".format(style_file_name))
+content_img = image_loader("./images/{}".format(content_file_name))
 
-
-style_img = image_loader("./images/picasso.jpg")
-content_img = image_loader("./images/dancing.jpg")
 
 unloader = transforms.ToPILImage()  # reconvert into PIL image
 
@@ -183,7 +189,7 @@ def get_style_model_and_losses(cnn, normalization_mean, normalization_std,
 
 input_img = content_img.clone()
 # if you want to use white noise instead uncomment the below line:
-# input_img = torch.randn(content_img.data.size(), device=device)
+#input_img = torch.randn(content_img.data.size(), device=device)
 
 # add the original input image to the figure:
 plt.figure()
@@ -192,10 +198,10 @@ imshow(input_img, title='Input Image')
 def get_input_optimizer(input_img):
     # this line to show that input is a parameter that requires a gradient
     optimizer = optim.LBFGS([input_img])
-    return optimizer    
+    return optimizer
 
 def run_style_transfer(cnn, normalization_mean, normalization_std,
-                       content_img, style_img, input_img, num_steps=300,
+                       content_img, style_img, input_img, num_steps=400,
                        style_weight=1000000, content_weight=1):
     """Run the style transfer."""
     print('Building the style transfer model..')
@@ -256,6 +262,8 @@ output = run_style_transfer(cnn, cnn_normalization_mean, cnn_normalization_std,
 
 plt.figure()
 imshow(output, title='Output Image')
+save_image(output,"./results/{}.jpg".format(
+    os.path.splitext(content_file_name)[0] + "_" + os.path.splitext(style_file_name)[0]))
 
 # sphinx_gallery_thumbnail_number = 4
 plt.ioff()
