@@ -36,13 +36,13 @@ def image_loader(image_name):
     image = loader(image).unsqueeze(0)
     return image.to(device, torch.float)
 
-#_______.
-#_INPUT_|
+#___________________________________________.
+#___________________INPUT___________________|
 style_file_name = "style_1.jpg"
 content_file_name = "dune.jpg"
 style_weight_pow = 10 # 10^(style_weight)
-epoch  = 50;
-#_______|
+epoch = 50
+#___________________________________________|
 style_img = image_loader("./images/{}".format(style_file_name))
 content_img = image_loader("./images/{}".format(content_file_name))
 
