@@ -4,6 +4,7 @@ FlavNET
 import torch
 import numpy as np
 import os
+import math
 
 import torch
 import torch.nn as nn
@@ -22,7 +23,7 @@ import copy
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 # desired size of the output image
-imsize = 512 if torch.cuda.is_available() else 256  # use small size if no gpu
+imsize = 1024 if torch.cuda.is_available() else 512  # use small size if no gpu
 
 loader = transforms.Compose([
     transforms.Resize(imsize),  # scale imported image
@@ -37,8 +38,10 @@ def image_loader(image_name):
 
 #_______.
 #_INPUT_|
-style_file_name = "emma.jpg"
-content_file_name = "emma.jpg"
+style_file_name = "style_1.jpg"
+content_file_name = "dune.jpg"
+style_weight_pow = 10 # 10^(style_weight)
+epoch  = 50;
 #_______|
 style_img = image_loader("./images/{}".format(style_file_name))
 content_img = image_loader("./images/{}".format(content_file_name))
@@ -201,7 +204,7 @@ def get_input_optimizer(input_img):
     return optimizer
 
 def run_style_transfer(cnn, normalization_mean, normalization_std,
-                       content_img, style_img, input_img, num_steps=400,
+                       content_img, style_img, input_img, num_steps=200,
                        style_weight=1000000, content_weight=1):
     """Run the style transfer."""
     print('Building the style transfer model..')
@@ -258,12 +261,13 @@ def run_style_transfer(cnn, normalization_mean, normalization_std,
     return input_img
 
 output = run_style_transfer(cnn, cnn_normalization_mean, cnn_normalization_std,
-                            content_img, style_img, input_img)
+                            content_img, style_img, input_img, epoch, math.pow(10,style_weight_pow))
 
 plt.figure()
 imshow(output, title='Output Image')
 save_image(output,"./results/{}.jpg".format(
-    os.path.splitext(content_file_name)[0] + "_" + os.path.splitext(style_file_name)[0]))
+    os.path.splitext(content_file_name)[0] + "_" + os.path.splitext(style_file_name)[0] +
+     "_" + str(imsize) + "_" + str(style_weight_pow) + "_" + str(epoch)))
 
 # sphinx_gallery_thumbnail_number = 4
 plt.ioff()
