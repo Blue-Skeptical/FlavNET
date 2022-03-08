@@ -7,14 +7,17 @@ style_file_name = "style_1.jpg"
 content_file_name = "dune.jpg"
 style_weight_pow = 10  # 10^(style_weight_pow)
 epoch = 50
-# To change image size, find imsize in utils.py
+imsize = 1024 if torch.cuda.is_available() else 512
 
 
 # _______________________________________________.
 # _____________GET AND PLOT INPUT________________|
 # _______________________________________________|
-style_img = ImageLoader("./images/{}".format(style_file_name))
-content_img = ImageLoader("./images/{}".format(content_file_name))
+loader = GetLoader(imsize)
+unloader = transforms.ToPILImage()  # Reconvert into PIL image
+
+style_img = ImageLoader("./images/{}".format(style_file_name), loader)
+content_img = ImageLoader("./images/{}".format(content_file_name), loader)
 
 # To initialize with white noise:
 # torch.randn(content_img.data.size(), device=device)

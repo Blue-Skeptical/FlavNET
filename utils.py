@@ -17,19 +17,16 @@ from torchvision.utils import save_image
 import copy
 
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-imsize = 1024 if torch.cuda.is_available() else 512
 
 # Resize input images at <imsize * imsize> pixels
 # and transform into torch sensor
-loader = transforms.Compose([
-    transforms.Resize(imsize),
-    transforms.ToTensor()])
-
-# Reconvert into PIL image
-unloader = transforms.ToPILImage()
+def GetLoader(imageSize):
+    return transforms.Compose([
+        transforms.Resize(imageSize),
+        transforms.ToTensor()])
 
 
-def ImageLoader(fileName):
+def ImageLoader(fileName,loader):
     image = Image.open(fileName)
     # Add one dimension
     #   image is:       [3,imsize,imsize]
@@ -43,11 +40,11 @@ def ImageLoader(fileName):
 def ShowImage(tensor, title=None):
     image = tensor.cpu().clone()
     image = image.squeeze(0)
-    image = unloader(image)
+    image = transforms.ToPILImage()(image)
     plt.imshow(image)
     if title is not None:
         plt.title(title)
-    plt.pause(0.001)
+    plt.pause(1.001)
 
 
 # Used for style loss
