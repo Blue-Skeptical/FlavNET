@@ -13,7 +13,9 @@ import matplotlib.pyplot as plt
 import torchvision.transforms as transforms
 import torchvision.models as models
 from torchvision.utils import save_image
+from torchvision import utils
 
+import cv2
 import copy
 
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
@@ -37,15 +39,31 @@ def ImageLoader(fileName,loader):
     return image.to(device, torch.float)
 
 
-def ShowImage(tensor, title=None):
+def ShowImage(tensor, title=None, save=False, file_name=None):
     image = tensor.cpu().clone()
     image = image.squeeze(0)
     image = transforms.ToPILImage()(image)
     plt.imshow(image)
+    if save and file_name != None and isinstance(file_name,str):
+        image.save(file_name)
+
     if title is not None:
         plt.title(title)
     plt.pause(1.001)
 
+def ShowImages(images):
+    _images = images.cpu().clone()
+    print(_images.size())
+
+def SaveImage(tensor, name):
+    image = tensor.cpu().clone()
+    image = image.squeeze(0)
+    #image = transforms.ToPILImage()(image)
+    #image = cv2.cvtColor(image.detach().numpy(),cv2.COLOR_BGR2RGB)
+    #image = np.asarray(image)
+    #image = Image.fromarray(image.astype(np.uint8))
+    #image.save(name)
+    save_image(image,name)
 
 # Used for style loss
 def GramMatrix(matrix):
