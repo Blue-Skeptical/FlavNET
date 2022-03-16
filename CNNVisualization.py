@@ -1,24 +1,29 @@
-import time
+import torch
 
 from utils import *
 
 # ____________________________________.
 # __________ INPUT ___________________|
 # <editor-fold desc="INPUT">
-IMG_SIZE = 64
-EPOCH = 100
-LEARNING_RATE = 0.005
+IMG_SIZE = 512
+EPOCH = 300
+LEARNING_RATE = 0.02
 WEIGHT_DECAY = 0.000005
+REGULARIZATION_WEIGHT = 0.000001
 
-target_file_name = "./images/gatto.jpg"
-representation_level = 20    # 0 means last layer (net output)
+target_file_name = "./images/cane.jpg"
+representation_level = 0   # 0 means last layer (net output)
 add_normalization_on_first_layer = False
+apply_final_blur = False
 # ____
 pretrained_net = models.vgg19(pretrained=True).features.to(device).eval()
 loader = GetLoader(IMG_SIZE)
 
-target_image = ImageLoader(target_file_name, loader)
-input_image = torch.rand([1, 3, IMG_SIZE, IMG_SIZE], requires_grad=True)
+target_image = ImageLoader(target_file_name, loader).to(device)
+input_image = torch.rand([1, 3, IMG_SIZE, IMG_SIZE], requires_grad=True, device=device)
+#input_image = ImageLoader("./images/me.jpg",loader)
+input_image = input_image.to(device)
+input_image.requires_grad_(True)
 # </editor-fold>
 # ____________________________________.
 
@@ -52,7 +57,7 @@ class NormalizationLevel(nn.Module):
 # ____________________________________.
 # _________ INIT MODEL _______________|
 # <editor-fold desc="INIT MODEL">
-model = nn.Sequential()
+model = nn.Sequential().to(device)
 target_representation_level = None
 
 if representation_level > len(list(pretrained_net.children())):
@@ -75,6 +80,8 @@ for i, layer in enumerate(pretrained_net.children()):
         target_representation_level = TargetRepresentationLevel(_target)
         model.add_module("layer_" + str(i+1), target_representation_level)
         break
+
+model.requires_grad_(False)
 # </editor-fold>
 # ____________________________________.
 
@@ -83,6 +90,8 @@ for i, layer in enumerate(pretrained_net.children()):
 # ____________ OPTIMIZER _____________.
 # <editor-fold desc="OPTIMIZER">
 optimizer = optim.Adam([input_image], lr=LEARNING_RATE, weight_decay=WEIGHT_DECAY)
+#optimizer = optim.SGD([input_image], lr=LEARNING_RATE, momentum=0.9)
+
 # </editor-fold>
 # ____________________________________.
 
@@ -92,7 +101,7 @@ optimizer = optim.Adam([input_image], lr=LEARNING_RATE, weight_decay=WEIGHT_DECA
 # <editor-fold desc="VISUALIZATION">
 plt.ion()
 start_time = time.time()
-
+current_time = start_time
 if representation_level != 0:
     target_rep = target_representation_level.targetRep
 else:
@@ -110,21 +119,30 @@ for i in range(0, EPOCH):
     else:
         current_rep = target_representation_level.currentRep
 
-    regularise = torch.linalg.norm(input_image.view(-1,1,1) - input_image.detach().view(-1,1,1).mean(), dim=1, ord=6).mean()
+    """    regularise = torch.linalg.norm(
+        input_image.view(-1, 1, 1) - input_image.detach().view(-1, 1, 1).mean(), dim=1, ord=6
+    ).sum()"""
+    regularise = ((input_image.view(-1))**6).sum() * REGULARIZATION_WEIGHT
 
     loss = F.mse_loss(current_rep, target_rep) + regularise
 
     if i % 10 == 0:
-        print("Loss " + str(i) + ": " + str(loss) + "\n -----> " + str(time.time() - start_time))
+        print("Loss " + str(i) + ": " + str(loss) + "\n -----> " + str(time.time() - current_time))
 
     loss.backward()
     optimizer.step()
 
+    current_time = time.time()
     with torch.no_grad():
         optimizer.zero_grad()
         input_image.clamp_(0, 1)
 # </editor-fold>
 # ____________________________________.
+print("Execution time: %.2f", time.time() - start_time)
+
+if apply_final_blur:
+    input_image = input_image.squeeze(0)
+    input_image = transforms.GaussianBlur(kernel_size=(5,5), sigma=3)(input_image)
 
 ShowImage(input_image,save=True,file_name= "gatto3R.jpg")
 input()
