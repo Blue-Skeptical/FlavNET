@@ -1,8 +1,11 @@
 import numpy as np
 import os
 import math
+import time
+import logging
 
 import torch
+import torch.linalg
 import torch.nn as nn
 import torch.nn.functional as F
 import torch.optim as optim
@@ -40,20 +43,27 @@ def ImageLoader(fileName,loader):
 
 
 def ShowImage(tensor, title=None, save=False, file_name=None):
-    image = tensor.cpu().clone()
-    image = image.squeeze(0)
-    image = transforms.ToPILImage()(image)
+    image = GetImageFromTensor(tensor)
     plt.imshow(image)
-    if save and file_name != None and isinstance(file_name,str):
+    if save and (file_name is not None) and isinstance(file_name,str):
         image.save(file_name)
 
     if title is not None:
         plt.title(title)
     plt.pause(1.001)
 
-def ShowImages(images):
-    _images = images.cpu().clone()
-    print(_images.size())
+def ShowImages(tensors):
+    for i,tensor in enumerate(tensors):
+        img = GetImageFromTensor(tensor)
+        plt.subplot(1,len(tensors),i+1)
+        plt.imshow(img)
+    plt.pause(1)
+
+def GetImageFromTensor(tensor):
+    image = tensor.cpu().clone()
+    image = image.squeeze(0)
+    image = transforms.ToPILImage()(image)
+    return image
 
 def SaveImage(tensor, name):
     image = tensor.cpu().clone()
