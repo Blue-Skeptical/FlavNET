@@ -1,27 +1,41 @@
-import torch
-
 from utils import *
-
+'''
+GUIDA:
+    -   Per effettuare rappresentazione inversa, selezionare la modalità FunctionalMode.InverseRepresentation.
+        Selezionare l'immagine target, i livelli di output e i filtri considerati (tendenzialmente TUTTI, "None")
+        Impostare come immagine in ingresso del rumore e vedere se la rete riesce a ricostruire l'immagine di partenza)
+    -   Per effettuare visualizzazione dei filtri e una semplice deepdream (senza pyramid) selezionare
+        FunctionalMode.FilterVisualization.     
+'''
 # ____________________________________.
 # __________ INPUT ___________________|
 # <editor-fold desc="INPUT">
 IMG_SIZE = 512
-EPOCH = 300
-LEARNING_RATE = 0.02
+EPOCH = 500
+LEARNING_RATE = 5
+''' ADAM optimizer parameters'''
 WEIGHT_DECAY = 0.000005
-REGULARIZATION_WEIGHT = 0.000001
+''' SGD optimizer parameters'''
+MOMENTUM = 0.9
 
-target_file_name = "./images/cane.jpg"
+REGULARIZATION_WEIGHT = 0.0001
+
+modality = FunctionalMode.FilterVisualization
+optimizer_selector = OptimizerSelector.SGD
+
+target_file_name = "./images/wolf.jpg"
+output_file_name = "0_50.jpg"
 representation_level = 0   # 0 means last layer (net output)
-add_normalization_on_first_layer = False
+filter_selection = 1  # specify a filter or "None" to use all the filters
+add_normalization_on_first_layer = True
 apply_final_blur = False
 # ____
 pretrained_net = models.vgg19(pretrained=True).features.to(device).eval()
 loader = GetLoader(IMG_SIZE)
 
-target_image = ImageLoader(target_file_name, loader).to(device)
+target_image = LoadTensorFromFile(target_file_name, loader).to(device)
 input_image = torch.rand([1, 3, IMG_SIZE, IMG_SIZE], requires_grad=True, device=device)
-#input_image = ImageLoader("./images/me.jpg",loader)
+#input_image = LoadTensorFromFile("./images/wolf.jpg",loader)
 input_image = input_image.to(device)
 input_image.requires_grad_(True)
 # </editor-fold>
@@ -32,13 +46,26 @@ input_image.requires_grad_(True)
 # __________ MY LAYERS _______________|
 #<editor-fold desc="MY LAYERS">
 class TargetRepresentationLevel(nn.Module):
-    def __init__(self, target):
+    def __init__(self, target, filter_selected = None):
         super(TargetRepresentationLevel, self).__init__()
-        self.targetRep = target.detach()
+        if filter_selected is not None:
+            if filter_selected > target.size()[1]:
+                logging.error("Target representation has only {:d} filter, "
+                              "but you selected filter number {:d}".format(target.size()[1],filter_selected))
+                exit(-2)
+            self.targetRep = target[0, filter_selected, :, :].detach()
+        else:
+            self.targetRep = target.detach()
+
         self.currentRep = torch.Tensor()
+        self.filterSelected = filter_selected
 
     def forward(self, image):
-        self.currentRep = image
+        if self.filterSelected is not None:
+            self.currentRep = image[0, self.filterSelected, :, :]
+        else:
+            self.currentRep = image
+
         return image
 
 
@@ -77,7 +104,7 @@ for i, layer in enumerate(pretrained_net.children()):
     if representation_level - 1 == i:
         print("____ TARGET LAYER AFTER LAYER " + str(i) + ": " + str(list(model.modules())[i]))
         _target = model(target_image).detach()
-        target_representation_level = TargetRepresentationLevel(_target)
+        target_representation_level = TargetRepresentationLevel(_target, filter_selected=filter_selection)
         model.add_module("layer_" + str(i+1), target_representation_level)
         break
 
@@ -89,9 +116,11 @@ model.requires_grad_(False)
 # ____________________________________.
 # ____________ OPTIMIZER _____________.
 # <editor-fold desc="OPTIMIZER">
-optimizer = optim.Adam([input_image], lr=LEARNING_RATE, weight_decay=WEIGHT_DECAY)
-#optimizer = optim.SGD([input_image], lr=LEARNING_RATE, momentum=0.9)
-
+if optimizer_selector is OptimizerSelector.ADAM:
+    optimizer = optim.Adam([input_image], lr=LEARNING_RATE, weight_decay=WEIGHT_DECAY)
+elif optimizer_selector is OptimizerSelector.SGD:
+    optimizer = optim.SGD([input_image], lr=LEARNING_RATE, momentum=MOMENTUM, weight_decay=WEIGHT_DECAY)
+print("____ OPTIMIZER SELECTED {:s}".format(optimizer_selector))
 # </editor-fold>
 # ____________________________________.
 
@@ -109,7 +138,6 @@ else:
     target_rep = model(target_image).detach()
 
 for i in range(0, EPOCH):
-    loss = 0
     plt.close('all')
 
     current_output = model(input_image)
@@ -119,30 +147,30 @@ for i in range(0, EPOCH):
     else:
         current_rep = target_representation_level.currentRep
 
-    """    regularise = torch.linalg.norm(
-        input_image.view(-1, 1, 1) - input_image.detach().view(-1, 1, 1).mean(), dim=1, ord=6
-    ).sum()"""
-    regularise = ((input_image.view(-1))**6).sum() * REGULARIZATION_WEIGHT
+    if modality is FunctionalMode.InverseRepresentation:
+        regularise = ((input_image.view(-1))**6).sum() * REGULARIZATION_WEIGHT
+        loss = F.mse_loss(current_rep, target_rep) + regularise
 
-    loss = F.mse_loss(current_rep, target_rep) + regularise
+    elif modality is FunctionalMode.FilterVisualization:
+        loss = -torch.mean(current_rep)
 
-    if i % 10 == 0:
-        print("Loss " + str(i) + ": " + str(loss) + "\n -----> " + str(time.time() - current_time))
+    if i % 50 == 0:
+        print("Loss " + str(i) + ": " + "{:.4f}".format(loss.item()) + "\t-----> {:.2f} s".format(time.time() - current_time))
+        current_time = time.time()
+        _save_tensor = input_image.detach()
+        if apply_final_blur:
+            _save_tensor = BlurTensor(input_image,size = 1, sigma=3)
+        SaveImage(_save_tensor, "./generated/{:d}_{:s}".format(i, output_file_name))
 
     loss.backward()
     optimizer.step()
 
-    current_time = time.time()
     with torch.no_grad():
         optimizer.zero_grad()
         input_image.clamp_(0, 1)
 # </editor-fold>
 # ____________________________________.
-print("Execution time: %.2f", time.time() - start_time)
+print("Execution time: {:.2f} s".format(time.time() - start_time))
 
-if apply_final_blur:
-    input_image = input_image.squeeze(0)
-    input_image = transforms.GaussianBlur(kernel_size=(5,5), sigma=3)(input_image)
-
-ShowImage(input_image,save=True,file_name= "gatto3R.jpg")
+#ShowImage(input_image,save=True, file_name="limone.jpg")
 input()
