@@ -1,3 +1,5 @@
+import torch
+
 from utils import *
 
 # ____________________________________.
@@ -5,8 +7,8 @@ from utils import *
 # <editor-fold desc="INPUT">
 IMG_SIZE = 512
 EPOCH = 200
-LEARNING_RATE = 0.5
-PYRAMID_DEPTH = 4
+LEARNING_RATE = 3
+PYRAMID_DEPTH = 1
 ''' ADAM optimizer parameters'''
 WEIGHT_DECAY = 0.0000005
 ''' SGD optimizer parameters'''
@@ -18,14 +20,14 @@ optimizer_selector = OptimizerSelector.SGD
 
 output_file_name = "dd.jpg"
 representation_level = 0   # 0 means last layer (net output)
-filter_selection = None  # specify a filter or "None" to use all the filters
+filter_selection = 1  # specify a filter or "None" to use all the filters
 # ____
-pretrained_net = models.vgg19(pretrained=True).features.to(device).eval()
+pretrained_net = models.vgg16(pretrained=True).features.to(device).eval()
 loader = GetLoader(IMG_SIZE)
 
 #input_image = torch.rand([1, 3, IMG_SIZE, IMG_SIZE], device=device).detach().cpu().squeeze(0).numpy()
 #input_image = np.moveaxis(input_image,0,-1)
-input_image = np.asarray(GetImageReshapedFromFile("./images/natalie.jpg",loader))
+input_image = np.asarray(GetImageReshapedFromFile("./images/style4.jpg",loader))
 #input_image = NormalizeImage(input_image)
 input_tensor = GetTensorFromImage(input_image, require_grad=True)
 
@@ -107,7 +109,7 @@ start_time = time.time()
 current_time = start_time
 
 for l in range(0,PYRAMID_DEPTH):
-    new_shape = GetCurrentPyramidalShape([IMG_SIZE, IMG_SIZE, 3], l, PYRAMID_DEPTH,2)
+    new_shape = GetCurrentPyramidalShape([IMG_SIZE, IMG_SIZE, 3], l, PYRAMID_DEPTH,1.4)
     input_image = cv2.resize(input_image, [new_shape[0], new_shape[1]])
     input_tensor = GetTensorFromImage(input_image, require_grad= True)
     ShowImage(input_tensor)
@@ -122,9 +124,9 @@ for l in range(0,PYRAMID_DEPTH):
         else:
             current_rep = target_representation_level.currentRep
 
-        loss = -torch.mean(current_rep)
-#        zeros = torch.zeros_like(current_rep,requires_grad=False)
-#        loss = nn.MSELoss(reduction='mean')(current_rep,zeros)
+#        loss = -torch.mean(current_rep)
+        zeros = torch.zeros_like(current_rep,requires_grad=False)
+        loss = -nn.MSELoss(reduction='mean')(current_rep,zeros)
 
         if i % 50 == 0:
             print("Loss " + str(i) + ": " + "{:.4f}".format(loss.item()) + "\t-----> {:.2f} s".format(time.time() - current_time))
