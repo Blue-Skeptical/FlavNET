@@ -8,19 +8,6 @@ sg.theme(FN_MAIN_THEME)
 
 PREFIX = "IR"
 
-"""layout = []
-parameters_layout = []
-parameters_frame = []
-
-parameters_layout = GU.AppendUnder(GU.GetImageSizeLayer(PREFIX), parameters_layout)
-parameters_layout = GU.AppendRight(GU.GetEpochLayer(PREFIX, getFrameOnly=True), parameters_layout)
-parameters_layout = GU.AppendUnder(GU.GetLearningRateLayer(PREFIX), parameters_layout)
-parameters_layout = GU.AppendUnder(GU.GetOptimizerLayer(PREFIX), parameters_layout)
-parameters_layout = GU.AppendUnder(GU.GetNetLayer(PREFIX), parameters_layout)
-
-parameters_frame = sg.Frame(title="Inverse Representation", layout=parameters_layout)
-layout = copy.deepcopy([parameters_frame])"""
-
 layout = []
 frame = sg.Frame(title="Parameters", layout=[
     [GU.GetImageSizeLayer(PREFIX,getFrameOnly=True), GU.GetEpochLayer(PREFIX, getFrameOnly=True)],
@@ -28,6 +15,17 @@ frame = sg.Frame(title="Parameters", layout=[
     [GU.GetOptimizerLayer(PREFIX,getFrameOnly=True)],
     [GU.GetNetLayer(PREFIX,getFrameOnly=True)]
 ])
-layout.append([frame, sg.Frame(title='Source image',vertical_alignment='t', layout=[[sg.Image(GU.OpenImage('../images/gatto.jpg', resize=(200,200)))]])])
+
+frame_preview = sg.Frame(title="I/O", layout=[
+    [sg.Frame(title='Target image', right_click_menu=GU.GetImageMenu("target"), vertical_alignment='t', layout=[[sg.Image()]], size=(220, 220))],
+    [sg.Frame(title='Input image',right_click_menu=GU.GetImageMenu("input"), vertical_alignment='t', layout=[[sg.Image()]], size=(220, 220))],
+    [sg.HorizontalSeparator()],
+    [sg.Frame(title='Output image', vertical_alignment='t', layout=[[sg.Image()]], size=(220, 220))]
+])
+
+layout.append([frame,frame_preview])
+
+def HandleEvent(event,values):
+    pass
 
 #sg.Frame(title='Source image',vertical_alignment='t', layout=[[sg.Image(OpenImage('../images/gatto.jpg', resize=(200,200)))]])

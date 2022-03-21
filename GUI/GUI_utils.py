@@ -88,6 +88,10 @@ def GetNetLayer(prefix,getFrameOnly=False):
         return frame
     return copy.deepcopy(l_net)
 
+def GetImageMenu(prefix):
+    menu_def = [['Unused'],['load_{:s}_image'.format(prefix), 'set_{:s}_random'.format(prefix)]]
+    return menu_def
+
 def AppendRight(what,where):
     final_where = copy.deepcopy(where)
     final_where[0].append(what)
