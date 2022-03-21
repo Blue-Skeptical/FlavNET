@@ -24,7 +24,7 @@ modality = FunctionalMode.FilterVisualization
 optimizer_selector = OptimizerSelector.SGD
 
 target_file_name = "./images/wolf.jpg"
-output_file_name = "0_50.jpg"
+output_file_name = "step.jpg"
 representation_level = 0   # 0 means last layer (net output)
 filter_selection = 1  # specify a filter or "None" to use all the filters
 add_normalization_on_first_layer = True

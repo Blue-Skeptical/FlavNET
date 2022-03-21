@@ -35,6 +35,10 @@ class FunctionalMode(Enum):
     InverseRepresentation = 1,
     FilterVisualization = 2
 
+class PretrainedNet(Enum):
+    vgg16 = 1,
+    vgg19 = 2
+
 # Resize input images at <imsize * imsize> pixels
 # and transform into torch sensor
 def GetLoader(imageSize):
