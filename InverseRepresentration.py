@@ -7,10 +7,32 @@ GUIDA:
     -   Per effettuare visualizzazione dei filtri e una semplice deepdream (senza pyramid) selezionare
         FunctionalMode.FilterVisualization.     
 '''
+class InverseRepresentation():
+    def __init__(self, tg_img, in_img,
+                 img_size, epoch, lr,
+                 optimizer, weight_decay, momentum,
+                 net,layer,filter,regularization,modality):
+        self.target_file_name = tg_img
+        self.input_image = in_img
+        self.img_size = img_size
+        self.epoch = epoch
+        self.lr = lr
+        self.optim = optimizer
+        self.weight_decay = weight_decay
+        self.momentum = momentum
+        self.net = net
+        self.layer = layer
+        self.filter = filter
+        self.regularization = regularization
+        self.modality = modality
+
+    def Fire(self):
+        pass
+
 # ____________________________________.
 # __________ INPUT ___________________|
 # <editor-fold desc="INPUT">
-IMG_SIZE = 512
+"""IMG_SIZE = 512
 EPOCH = 500
 LEARNING_RATE = 5
 ''' ADAM optimizer parameters'''
@@ -173,4 +195,4 @@ for i in range(0, EPOCH):
 print("Execution time: {:.2f} s".format(time.time() - start_time))
 
 #ShowImage(input_image,save=True, file_name="limone.jpg")
-input()
+input()"""

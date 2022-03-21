@@ -4,6 +4,7 @@ import utils
 from colours_scheme import *
 import GUI_utils as GU
 import PySimpleGUI as sg
+from InverseRepresentration import InverseRepresentation
 
 sg.theme(FN_MAIN_THEME)
 
@@ -15,7 +16,8 @@ frame = sg.Frame(title="Parameters", layout=[
     [GU.GetImageSizeLayer(PREFIX,getFrameOnly=True), GU.GetEpochLayer(PREFIX, getFrameOnly=True)],
     [GU.GetLearningRateLayer(PREFIX,getFrameOnly=True)],
     [GU.GetOptimizerLayer(PREFIX,getFrameOnly=True)],
-    [GU.GetNetLayer(PREFIX,getFrameOnly=True)]
+    [GU.GetNetLayer(PREFIX,getFrameOnly=True)],
+    [GU.GetRegularizationLayer(PREFIX,True)]
 ])
 
 frame_preview = sg.Frame(title="I/O", layout=[
@@ -40,6 +42,7 @@ class InverseRepresentatorHandler:
         self.net = ""
         self.layer = 0
         self.filter = 0
+        self.regularization = 0
 
     def HandleEvent(self,event,values,window):
         #LOAD TARGET IMAGE
@@ -84,13 +87,31 @@ class InverseRepresentatorHandler:
         else:
             print('Select an optimizer')
             return 0
-
+        self.momentum = float(values['--{:s}_momentum--'.format(PREFIX)])
+        self.weight_decay = float(values['--{:s}_weight_decay--'.format(PREFIX)])
         # </editor-fold>
         # <editor-fold desc="Net">
         if values['--{:s}_VGG16_optimizer--'.format(PREFIX)]: self.net = utils.PretrainedNet.vgg16
-        elif values['--{:s}_VGG16_optimizer--'.format(PREFIX)]: self.net = utils.PretrainedNet.vgg19
+        elif values['--{:s}_VGG19_optimizer--'.format(PREFIX)]: self.net = utils.PretrainedNet.vgg19
         else:
             print("Select a model")
+            return 0
+        if (values['--{:s}_layer--'.format(PREFIX)]).isnumeric():
+            self.layer = int((values['--{:s}_layer--'.format(PREFIX)]))
+        else:
+            print("Layer must be int")
+            return 0
+        if (values['--{:s}_filter--'.format(PREFIX)]).isnumeric():
+            self.filter = int((values['--{:s}_filter--'.format(PREFIX)]))
+        else:
+            print("Layer must be int")
+            return 0
+        # </editor-fold>
+        # <editor-fold desc="Regularization">
+        if (values['--{:s}_regularization--'.format(PREFIX)]).isnumeric():
+            self.regularization = int((values['--{:s}_regularization--'.format(PREFIX)]))
+        else:
+            print("Regularization must be int")
             return 0
         # </editor-fold>
         #FIRE
@@ -101,6 +122,11 @@ class InverseRepresentatorHandler:
             elif self.input_filename == "":
                 print('Select an input image')
                 return 0
+
+            ir = InverseRepresentation(self.target_filename,self.input_filename,self.image_size,
+                                       self.epoch,self.learning_rate,self.optimizer,self.weight_decay,self.momentum,
+                                       self.net,self.layer,self.filter,self.regularization,utils.FunctionalMode.InverseRepresentation)
+            ir.Fire()
 
 inverseRepresentatorHandler = InverseRepresentatorHandler()
 

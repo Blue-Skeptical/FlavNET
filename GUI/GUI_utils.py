@@ -79,10 +79,8 @@ def GetNetLayer(prefix,getFrameOnly=False):
 
     frame = sg.Frame(title="Pretrained Net", layout=[
         [sg.Radio('VGG16', 'model',size=(12, 1), key=key1), sg.Radio('VGG19', 'model',size=(12, 12), key=key2)],
-        [sg.Text("Layer (0 = output)", justification='c', expand_x=True)],
-        [sg.Slider((0.00,2000),resolution=1,tick_interval= 500, expand_x=True, key=key3, orientation='h')],
-        [sg.Text("Filter (0 = all)", justification='c', expand_x=True)],
-        [sg.Slider((0, 2000), resolution=1, tick_interval=500, expand_x=True, key=key4, orientation='h')]
+        [sg.Text("Layer (0 = output)", justification='l', expand_x=True),sg.Text("Filter (0 = all)", justification='r', expand_x=True)],
+        [sg.Input(key=key3, justification='l',expand_x=True), sg.Input(key=key4,justification='l',expand_x=True)],
     ], expand_x=True)
 
     l_net = []
@@ -90,6 +88,18 @@ def GetNetLayer(prefix,getFrameOnly=False):
     if getFrameOnly:
         return frame
     return copy.deepcopy(l_net)
+
+def GetRegularizationLayer(prefix,getFrameOnly=False):
+    key = '--{:s}_regularization--'.format(prefix)
+    frame = sg.Frame(title="Regularization", layout=[
+        [sg.Text("Regularization weight", justification='c',expand_x=True)],
+        [sg.Input(key=key, justification='c',expand_x=True)]
+    ], expand_x=True, expand_y=True)
+    l_reg = []
+    l_reg.append([frame])
+    if getFrameOnly:
+        return frame
+    return copy.deepcopy(l_reg)
 
 def GetImageMenu(prefix):
     menu_def = [['Unused'],['load_{:s}_image'.format(prefix), 'set_{:s}_random'.format(prefix)]]
