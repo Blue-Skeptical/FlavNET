@@ -1,6 +1,9 @@
 import PIL
 import PySimpleGUI as sg
+import torch
+
 from colours_scheme import *
+from utils import *
 from PIL import Image
 import copy
 import io
@@ -104,7 +107,7 @@ def AppendUnder(what,where):
 
     return copy.deepcopy(where)
 
-def OpenImage(file_or_bytes, resize=None):
+def OpenImage(file_or_bytes, resize=None, rand = False):
     '''
     Will convert into bytes and optionally resize an image that is a file or a base64 bytes object.
     Turns into  PNG format in the process so that can be displayed by tkinter
@@ -115,6 +118,13 @@ def OpenImage(file_or_bytes, resize=None):
     :return: (bytes) a byte-string object
     :rtype: (bytes)
     '''
+    if rand:
+        img = GetImageFromTensor(torch.rand([3,resize[0],resize[1]]))
+        bio = io.BytesIO()
+        img.save(bio, format="PNG")
+        del img
+        return bio.getvalue()
+
     if isinstance(file_or_bytes, str):
         img = PIL.Image.open(file_or_bytes)
     else:

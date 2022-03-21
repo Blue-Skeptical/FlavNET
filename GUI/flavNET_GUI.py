@@ -16,7 +16,7 @@ layout = [
                 sg.Tab('Deep Dream', t2, key= "--DD--")
             ]],key="--TAB--")
     ],
-    [sg.Button(button_text="FIRE", expand_y=True, expand_x=True),sg.Output(size=(60,5), key = '--OUTPUT--', expand_x=True)]
+    [sg.Button(button_text="FIRE", expand_y=True, expand_x=True,key='--fire--')] #,sg.Output(size=(60,5), key = '--OUTPUT--', expand_x=True)
 ]
 
 window = sg.Window('FlavNET', layout, default_element_size=(12,1))
@@ -25,7 +25,7 @@ while True:
     event, values = window.read()
 
     if values["--TAB--"] == "--IR--":
-        IR.HandleEvent(event,values)
+        IR.inverseRepresentatorHandler.HandleEvent(event,values,window)
 
 
 
