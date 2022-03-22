@@ -1,9 +1,9 @@
 import PIL
 import PySimpleGUI as sg
 import torch
-
+from GUI_utils import *
 from colours_scheme import *
-from utils import *
+from nn_utils import *
 from PIL import Image
 import copy
 import io
@@ -153,3 +153,6 @@ def OpenImage(file_or_bytes, resize=None, rand = False):
     img.save(bio, format="PNG")
     del img
     return bio.getvalue()
+
+def ClearConsole(console):
+    console.update("")

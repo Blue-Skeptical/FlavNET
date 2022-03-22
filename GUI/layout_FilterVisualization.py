@@ -8,7 +8,7 @@ from InverseRepresentration import InverseRepresentation
 
 sg.theme(FN_MAIN_THEME)
 
-PREFIX = "IR"
+PREFIX = "FV"
 
 # Parameter needed for GUI
 ou_img = sg.Image()
@@ -31,7 +31,7 @@ frame_preview = sg.Frame(title="I/O", layout=[
 
 layout.append([frame,frame_preview])
 
-class InverseRepresentatorHandler:
+class FilterVisualizationHandler:
     def __init__(self):
         self.target_filename = ""
         self.input_filename = ""
@@ -135,10 +135,10 @@ class InverseRepresentatorHandler:
 
         ir = InverseRepresentation(self.target_filename,self.input_filename,self.image_size,self.epoch,
                                    self.learning_rate, self.optimizer, self.weight_decay, self.momentum,
-                                   self.net, self.layer, self.filter, self.regularization, FunctionalMode.InverseRepresentation,
+                                   self.net, self.layer, self.filter, self.regularization, FunctionalMode.FilterVisualization,
                                    window, ou_img, console)
         ir.Fire()
 
-inverseRepresentatorHandler = InverseRepresentatorHandler()
+filterVisualizationHandler = FilterVisualizationHandler()
 
 #sg.Frame(title='Source image',vertical_alignment='t', layout=[[sg.Image(OpenImage('../images/gatto.jpg', resize=(200,200)))]])
