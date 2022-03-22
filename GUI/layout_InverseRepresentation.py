@@ -20,7 +20,7 @@ frame = sg.Frame(title="Parameters", layout=[
     [GU.GetOptimizerLayer(PREFIX,getFrameOnly=True)],
     [GU.GetNetLayer(PREFIX,getFrameOnly=True)],
     [GU.GetRegularizationLayer(PREFIX,True)]
-])
+],vertical_alignment='bottom')
 
 frame_preview = sg.Frame(title="I/O", layout=[
     [sg.Frame(title='Target image', right_click_menu=GU.GetImageMenu("target"), vertical_alignment='t', layout=[[sg.Image(key='--{:s}_target_image--'.format(PREFIX))]], size=(220, 220))],

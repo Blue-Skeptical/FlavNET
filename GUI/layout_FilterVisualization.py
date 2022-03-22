@@ -4,7 +4,7 @@ from nn_utils import *
 from colours_scheme import *
 import GUI_utils as GU
 import PySimpleGUI as sg
-from InverseRepresentration import InverseRepresentation
+from FilterVisualization import FilterVisualization
 
 sg.theme(FN_MAIN_THEME)
 
@@ -19,15 +19,13 @@ frame = sg.Frame(title="Parameters", layout=[
     [GU.GetLearningRateLayer(PREFIX,getFrameOnly=True)],
     [GU.GetOptimizerLayer(PREFIX,getFrameOnly=True)],
     [GU.GetNetLayer(PREFIX,getFrameOnly=True)],
-    [GU.GetRegularizationLayer(PREFIX,True)]
-])
+],vertical_alignment='b')
 
 frame_preview = sg.Frame(title="I/O", layout=[
-    [sg.Frame(title='Target image', right_click_menu=GU.GetImageMenu("target"), vertical_alignment='t', layout=[[sg.Image(key='--{:s}_target_image--'.format(PREFIX))]], size=(220, 220))],
     [sg.Frame(title='Input image',right_click_menu=GU.GetImageMenu("input"), vertical_alignment='t', layout=[[sg.Image(key='--{:s}_input_image--'.format(PREFIX))]], size=(220, 220))],
     [sg.HorizontalSeparator()],
     [sg.Frame(title='Output image', vertical_alignment='t', layout=[[ou_img]], size=(220, 220))]
-])
+], vertical_alignment='b')
 
 layout.append([frame,frame_preview])
 
@@ -47,18 +45,6 @@ class FilterVisualizationHandler:
         self.regularization = 0
 
     def HandleEvent(self,event,values,window, console):
-        #LOAD TARGET IMAGE
-        if event == "load_target_image":
-            self.target_filename = sg.popup_get_file('file to open', no_window=True)
-
-            if self.target_filename.split('.')[1] != 'jpg' and self.target_filename.split('.')[1] != 'jpeg' and self.target_filename.split('.')[1] != 'png':
-                print('Select .png .jpeg .jpg')
-                return 0
-            else:
-                window['--{:s}_target_image--'.format(PREFIX)].update(data=GU.OpenImage(self.target_filename,(220,220)))
-        if event == "set_target_random":
-            window['--{:s}_target_image--'.format(PREFIX)].update(data = GU.OpenImage("",(220,220),rand=True))
-            self.target_filename = "RANDOM"
         #LOAD INPUT IMAGE
         if event == "load_input_image":
             self.input_filename = sg.popup_get_file('file to open', no_window=True)
@@ -114,28 +100,17 @@ class FilterVisualizationHandler:
             print("Layer must be int")
             return 0
         # </editor-fold>
-        # <editor-fold desc="Regularization">
-        try:
-            float((values['--{:s}_regularization--'.format(PREFIX)]))
-            self.regularization = float((values['--{:s}_regularization--'.format(PREFIX)]))
-        except:
-            print("Regularization must be float")
-            return 0
-        # </editor-fold>
         # <editor-fold desc="Learning rate">
         self.learning_rate = float((values['--{:s}_learning_rate--'.format(PREFIX)]))
         # </editor-fold>
         #FIRE
-        if self.target_filename == "":
-            print('Select a target image')
-            return 0
-        elif self.input_filename == "":
+        if self.input_filename == "":
             print('Select an input image')
             return 0
 
-        ir = InverseRepresentation(self.target_filename,self.input_filename,self.image_size,self.epoch,
+        ir = FilterVisualization(self.input_filename,self.image_size,self.epoch,
                                    self.learning_rate, self.optimizer, self.weight_decay, self.momentum,
-                                   self.net, self.layer, self.filter, self.regularization, FunctionalMode.FilterVisualization,
+                                   self.net, self.layer, self.filter, FunctionalMode.FilterVisualization,
                                    window, ou_img, console)
         ir.Fire()
 

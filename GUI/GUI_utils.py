@@ -36,7 +36,7 @@ def GetEpochLayer(prefix, getFrameOnly = False):
     key = '--{:s}_epoch--'.format(prefix)
     frame = sg.Frame(title='Epoch',layout=[[
         sg.Slider((0,800),resolution=50, tick_interval=200, expand_x=True, key=key, orientation='h')
-    ]], expand_x=True, expand_y=True)
+    ]], expand_x=True, expand_y=False)
     l_epoch = []
     l_epoch.append([frame])
     if getFrameOnly:
@@ -156,3 +156,4 @@ def OpenImage(file_or_bytes, resize=None, rand = False):
 
 def ClearConsole(console):
     console.update("")
+    pass

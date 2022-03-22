@@ -22,7 +22,7 @@ layout = [
                 sg.Tab('Filter Visualization',t3, key="--FV--")
             ]],key="--TAB--")
     ],
-    [sg.Button(button_text="FIRE", expand_y=True, expand_x=True,key='--fire--'), console] #,console
+    [sg.Button(button_text="FIRE", expand_y=True, expand_x=True,key='--fire--'), console]   # ,console
 ]
 
 window = sg.Window('FlavNET', layout, default_element_size=(12,1))
@@ -39,5 +39,5 @@ while True:
 
 
 
-    if event == sg.WIN_CLOSED:           # always,  always give a way out!
+    if event == sg.WIN_CLOSED:  # always,  always give a way out!
         break
