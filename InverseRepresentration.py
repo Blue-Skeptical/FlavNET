@@ -88,7 +88,7 @@ class InverseRepresentation():
                     logging.error("Target representation has only {:d} filter, "
                                   "but you selected filter number {:d}".format(_target.size()[1], self.filter))
                     return False
-                self.target_representation_level = TargetRepresentationLevel(_target, filter_selected=self.filter-1)
+                self.target_representation_level = TargetRepresentationLevel(_target, filter_selected=self.filter)
                 self.model.add_module("layer_" + str(i + 1), self.target_representation_level)
                 break
         self.model.requires_grad_(False)
