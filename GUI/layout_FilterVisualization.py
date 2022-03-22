@@ -44,7 +44,7 @@ class FilterVisualizationHandler:
         self.filter = 0
         self.regularization = 0
 
-    def HandleEvent(self,event,values,window, console):
+    def HandleEvent(self,event,values,window, console, progress_bar):
         #LOAD INPUT IMAGE
         if event == "load_input_image":
             self.input_filename = sg.popup_get_file('file to open', no_window=True)
@@ -111,7 +111,7 @@ class FilterVisualizationHandler:
         ir = FilterVisualization(self.input_filename,self.image_size,self.epoch,
                                    self.learning_rate, self.optimizer, self.weight_decay, self.momentum,
                                    self.net, self.layer, self.filter, FunctionalMode.FilterVisualization,
-                                   window, ou_img, console)
+                                   window, ou_img, console, progress_bar)
         ir.Fire()
 
 filterVisualizationHandler = FilterVisualizationHandler()

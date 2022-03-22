@@ -15,7 +15,7 @@ class FilterVisualization():
     def __init__(self, in_img,
                  img_size, epoch, lr,
                  optimizer, weight_decay, momentum,
-                 net,layer,filter,modality, window=None, ou_img=None, console=None):
+                 net,layer,filter,modality, window=None, ou_img=None, console=None, progress_bar=None):
         self.in_img_name = in_img       # Input file name
         self.img_size = img_size        # Image size
         self.epoch = epoch              # n# epoch
@@ -37,6 +37,7 @@ class FilterVisualization():
         self.window = window                    # GUI window
         self.ou_img = ou_img                    # Output Image to show
         self.console = console
+        self.progress_bar = progress_bar
 
     def InitInput(self):
         add_normalization_on_first_layer = True
@@ -62,7 +63,7 @@ class FilterVisualization():
         if self.layer > len(list(self.pretrained_net.children())):
             logging.error("Pretrained net has only " + str(
                 len(list(self.pretrained_net.children()))) + " layers!\nSelect another representation level")
-            return -1
+            return False
 
         normalization_level = NormalizationLevel()
         self.model.add_module("norm", normalization_level)
@@ -76,13 +77,24 @@ class FilterVisualization():
             if self.layer - 1 == i:
                 print("____ TARGET LAYER AFTER LAYER " + str(i) + ": " + str(list(self.model.modules())[i]))
                 _target = self.model(self.input_image).detach()
-                if self.filter > _target.size()[1]:
+                if self.filter-1 > _target.size()[1]:
                     logging.error("Target representation has only {:d} filter, "
                                   "but you selected filter number {:d}".format(_target.size()[1], self.filter))
-                    return -1
-                self.target_representation_level = TargetRepresentationLevel(filter_selected=self.filter)
+                    return False
+                self.target_representation_level = TargetRepresentationLevel(filter_selected=self.filter-1)
                 self.model.add_module("layer_" + str(i + 1), self.target_representation_level)
                 break
+
+        if self.layer == 0:
+            _target = self.model(self.input_image).detach()
+            if self.filter-1 > _target.size()[1]:
+                logging.error("Target representation has only {:d} filter, "
+                              "but you selected filter number {:d}".format(_target.size()[1], self.filter))
+                return False
+
+            self.target_representation_level = TargetRepresentationLevel(filter_selected=self.filter-1)
+            self.model.add_module("layer_" + str(i + 1), self.target_representation_level)
+
         self.model.requires_grad_(False)
         return True
 
@@ -104,6 +116,8 @@ class FilterVisualization():
         current_time = start_time
 
         for i in range(0, self.epoch):
+            if self.progress_bar:
+                self.progress_bar.update(i*100/self.epoch)
             current_output = self.model(self.input_image)
 
             if self.layer == 0:
@@ -114,13 +128,13 @@ class FilterVisualization():
             self.loss = -torch.mean(current_rep)
 
             if i % 50 == 0:
+                ClearConsole(self.console)
                 print("Loss " + str(i) + ": " + "{:.4f}".format(self.loss.item()) + "\t-----> {:.2f} s".format(
                     time.time() - current_time))
                 current_time = time.time()
                 _save_tensor = self.input_image.detach()
                 SaveImage(_save_tensor, "./generated/{:d}_{:s}".format(i, "STEP.jpg"))
                 self.PrintOnOutputFrame(_save_tensor)
-                ClearConsole(self.console)
 
             self.loss.backward()
             self.optimizer.step()

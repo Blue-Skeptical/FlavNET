@@ -12,7 +12,8 @@ t2 = DD.layout  #Deep Dream
 
 t3 = FV.layout  #Filter Visualization
 
-console = sg.Output(size=(60,5), key = '--OUTPUT--', expand_x=True)
+console = sg.Output(size=(60,3), key = '--OUTPUT--', expand_x=True)
+progress_bar = sg.ProgressBar(max_value=100,orientation='h',key='--PROGRESSBAR--',expand_x=True,size=(40,8),bar_color=("green",FN_MAIN_COLOUR))
 
 layout = [
     [sg.TabGroup(
@@ -22,7 +23,10 @@ layout = [
                 sg.Tab('Filter Visualization',t3, key="--FV--")
             ]],key="--TAB--")
     ],
-    [sg.Button(button_text="FIRE", expand_y=True, expand_x=True,key='--fire--'), console]   # ,console
+    [sg.Button(button_text="FIRE", expand_y=True, expand_x=True,key='--fire--'), sg.Frame(title="",layout=[
+        [progress_bar],
+        [console]
+    ])]   # ,console
 ]
 
 window = sg.Window('FlavNET', layout, default_element_size=(12,1))
@@ -33,9 +37,9 @@ while True:
     ClearConsole(console)
 
     if values["--TAB--"] == "--IR--":
-        IR.inverseRepresentatorHandler.HandleEvent(event,values,window,console)
+        IR.inverseRepresentatorHandler.HandleEvent(event,values,window,console,progress_bar)
     if values["--TAB--"] == "--FV--":
-        FV.filterVisualizationHandler.HandleEvent(event,values,window,console)
+        FV.filterVisualizationHandler.HandleEvent(event,values,window,console,progress_bar)
 
 
 
