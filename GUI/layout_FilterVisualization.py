@@ -44,10 +44,17 @@ class FilterVisualizationHandler:
         self.filter = 0
         self.regularization = 0
 
+        self.fv = FilterVisualization()
+
     def HandleEvent(self,event,values,window, console, progress_bar):
+        #STOP
+        if event == '--stop--':
+            self.fv.Stop()
+            return
         #LOAD INPUT IMAGE
         if event == "load_input_image":
             self.input_filename = sg.popup_get_file('file to open', no_window=True)
+            if self.input_filename == "": return
 
             if self.input_filename.split('.')[1] != 'jpg' and self.input_filename.split('.')[1] != 'jpeg' and self.input_filename.split('.')[1] != 'png':
                 print('Select .png .jpeg .jpg')
@@ -108,11 +115,12 @@ class FilterVisualizationHandler:
             print('Select an input image')
             return 0
 
-        ir = FilterVisualization(self.input_filename,self.image_size,self.epoch,
+        self.fv.LoadParam(self.input_filename,self.image_size,self.epoch,
                                    self.learning_rate, self.optimizer, self.weight_decay, self.momentum,
                                    self.net, self.layer, self.filter, FunctionalMode.FilterVisualization,
                                    window, ou_img, console, progress_bar)
-        ir.Fire()
+
+        self.fv.Fire()
 
 filterVisualizationHandler = FilterVisualizationHandler()
 

@@ -12,10 +12,36 @@ GUIDA:
         FunctionalMode.FilterVisualization.     
 '''
 class FilterVisualization():
-    def __init__(self, in_img,
+    def __init__(self):
+        self.stop = False
+        self.in_img_name = None       # Input file name
+        self.img_size = None        # Image size
+        self.epoch = None              # n# epoch
+        self.lr = None                    # learning rate
+        self.optim = None          # utils.OptimizerSelector
+        self.weight_decay = None    # Weight decay
+        self.momentum = None            # Momentum
+        self.net = None                      # utils.PretrainedNet
+        self.layer = None                  # Index of target layer
+        self.filter = None                # Index of self.layer used
+        self.modality = None                # Inverse representation or Filter visualization
+        self.model = None # Final model used
+        self.pretrained_net = None              # Pretrained net loaded
+        self.input_image = None                 # input image tensor
+        self.optimizer = None                   # optimizer used
+        self.target_representation_level = None # Target layer
+        self.loss = None
+        # GUI fields
+        self.window = None                    # GUI window
+        self.ou_img = None                    # Output Image to show
+        self.console = None
+        self.progress_bar = None
+
+    def LoadParam(self, in_img,
                  img_size, epoch, lr,
                  optimizer, weight_decay, momentum,
                  net,layer,filter,modality, window=None, ou_img=None, console=None, progress_bar=None):
+        self.stop = False
         self.in_img_name = in_img       # Input file name
         self.img_size = img_size        # Image size
         self.epoch = epoch              # n# epoch
@@ -109,6 +135,7 @@ class FilterVisualization():
         current_time = start_time
 
         for i in range(0, self.epoch):
+            if self.stop: return
             if self.progress_bar:
                 self.progress_bar.update(i*100/self.epoch)
             current_output = self.model(self.input_image)
@@ -139,7 +166,13 @@ class FilterVisualization():
         # ____________________________________.
         print("Execution time: {:.2f} s".format(time.time() - start_time))
 
+    def Stop(self):
+        self.stop = True
+        if self.progress_bar is not None:
+            self.progress_bar.update(0)
+
     def Fire(self):
+        self.stop = False
         self.InitInput()
         if not self.InitModel():
             return -1

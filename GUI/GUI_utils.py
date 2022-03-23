@@ -58,8 +58,8 @@ def GetPyramidParameters(prefix, getFrameOnly = False):
     return copy.deepcopy(l_pyramid)
 
 def GetLossFunction(prefix, getFrameOnly = False):
-    key1 = '--{:s}_loss_functions_MEAN--'.format(prefix)
-    key2 = '--{:s}_loss_function_MSE'
+    key1 = '--{:s}_loss_function_MEAN--'.format(prefix)
+    key2 = '--{:s}_loss_function_MSE--'.format(prefix)
     frame = sg.Frame(title="Loss function", layout=[
         [sg.Radio('MEAN', 'loss_fun', size=(12, 1), key=key1),
          sg.Radio('MSE', 'loss_fun', size=(12, 1), key=key2)],

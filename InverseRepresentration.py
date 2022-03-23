@@ -12,10 +12,39 @@ GUIDA:
         FunctionalMode.FilterVisualization.     
 '''
 class InverseRepresentation():
-    def __init__(self, tg_img, in_img,
+    def __init__(self):
+        self.stop = False
+        self.tg_img_name = None       # Target image name
+        self.in_img_name = None       # Input file name
+        self.img_size = None        # Image size
+        self.epoch = None              # n# epoch
+        self.lr = None                    # learning rate
+        self.optim = None          # utils.OptimizerSelector
+        self.weight_decay = None    # Weight decay
+        self.momentum = None            # Momentum
+        self.net = None                      # utils.PretrainedNet
+        self.layer = None                  # Index of target layer
+        self.filter = None                # Index of self.layer used
+        self.regularization = None    # regularization weight
+        self.modality = None                # Inverse representation or Filter visualization
+        self.model = None # Final model used
+        self.pretrained_net = None              # Pretrained net loaded
+        self.target_image = None                # target image tensor
+        self.input_image = None                 # input image tensor
+        self.optimizer = None                   # optimizer used
+        self.target_representation_level = None # Target layer
+        self.loss = None
+        # GUI fields
+        self.window = None                    # GUI window
+        self.ou_img = None                    # Output Image to show
+        self.console = None
+        self.progress_bar = None
+
+    def LoadParam(self, tg_img, in_img,
                  img_size, epoch, lr,
                  optimizer, weight_decay, momentum,
                  net,layer,filter,regularization,modality, window=None, ou_img=None, console=None, progress_bar=None):
+        self.stop = False
         self.tg_img_name = tg_img       # Target image name
         self.in_img_name = in_img       # Input file name
         self.img_size = img_size        # Image size
@@ -117,6 +146,7 @@ class InverseRepresentation():
                     target_rep = target_rep[0,self.filter-1,:,:]
 
         for i in range(0, self.epoch):
+            if self.stop: return
             if self.progress_bar:
                 self.progress_bar.update(i*100/self.epoch)
 
@@ -155,7 +185,13 @@ class InverseRepresentation():
         # ____________________________________.
         print("Execution time: {:.2f} s".format(time.time() - start_time))
 
+    def Stop(self):
+        self.stop = True
+        if self.progress_bar is not None:
+            self.progress_bar.update(0)
+
     def Fire(self):
+        self.stop = False
         self.InitInput()
         if not self.InitModel():
             return -1

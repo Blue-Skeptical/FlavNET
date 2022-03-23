@@ -5,10 +5,38 @@ import nn_utils
 from nn_utils import *
 
 class DeepDream():
-    def __init__(self, in_img, img_size, epoch, p_depth, p_mul, lr, optimizer, weight_decay, momentum, loss,
+    def __init__(self):
+        self.stop = False
+        self.in_img_name = None
+        self.img_size = None
+        self.epoch = None
+        self.p_dept = None
+        self.p_mul = None
+        self.lr = None
+        self.optimizer = None
+        self.weight_decay = None
+        self.momentum = None
+        self.loss = None
+        self.net = None
+        self.layer = None
+        self.filter = None
+        #GUI
+        self.window = None
+        self.ou_img = None
+        self.console = None
+        self.progress_bar = None
+        #
+        self.input_image = None
+        self.input_tensor = None
+        self.pretrained_net = None
+        self.model = None
+        self.optim = None
+        self.target_representation_level = None
+
+    def LoadParam(self, in_img, img_size, epoch, p_depth, p_mul, lr, optimizer, weight_decay, momentum, loss,
                  net, layer, filter,
                  window=None, ou_img=None, console=None, progress_bar=None):
-
+        self.stop = False
         self.in_img_name = in_img
         self.img_size = img_size
         self.epoch = epoch
@@ -104,7 +132,6 @@ class DeepDream():
 
 
     def Visualization(self):
-        plt.ion()
         start_time = time.time()
         current_time = start_time
 
@@ -112,11 +139,11 @@ class DeepDream():
             new_shape = GetCurrentPyramidalShape([self.img_size, self.img_size, 3], l, self.p_dept, self.p_mul)
             self.input_image = cv2.resize(self.input_image, [new_shape[0], new_shape[1]])
             self.input_tensor = GetTensorFromImage(self.input_image, require_grad=True)
-            ShowImage(self.input_tensor)
 
             for i in range(0, self.epoch):
+                if self.stop: return
                 if self.progress_bar is not None:
-                    self.progress_bar.update(i*100/self.epoch*self.p_dept)
+                    self.progress_bar.update((i + l*self.epoch)*100/(self.epoch*self.p_dept))
 
                 plt.close('all')
                 current_output = self.model(self.input_tensor)
@@ -158,8 +185,13 @@ class DeepDream():
         # ____________________________________.
         print("Execution time: {:.2f} s".format(time.time() - start_time))
 
+    def Stop(self):
+        self.stop = True
+        if self.progress_bar is not None:
+            self.progress_bar.update(0)
 
     def Fire(self):
+        self.stop = False
         self.InitInput()
         if not self.InitModel():
             return -1
@@ -181,8 +213,8 @@ class TargetRepresentationLevel(nn.Module):
 
 
 
-a = DeepDream("./images/gatto.jpg",128,100,3,1.5,0.5,OptimizerSelector.GD,0,0,Losses.MEAN,PretrainedNet.vgg16,0,0,None,None,None,None)
-a.Fire()
+#a = DeepDream("./images/gatto.jpg",128,100,3,1.5,0.5,OptimizerSelector.GD,0,0,Losses.MEAN,PretrainedNet.vgg16,0,0,None,None,None,None)
+#a.Fire()
 
 
 # ____________________________________.

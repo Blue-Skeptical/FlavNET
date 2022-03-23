@@ -12,7 +12,7 @@ t2 = DD.layout  #Deep Dream
 
 t3 = FV.layout  #Filter Visualization
 
-console = sg.Output(size=(60,3), key = '--OUTPUT--', expand_x=True)
+console = sg.Output(size=(95,3), key = '--OUTPUT--', expand_x=True)
 progress_bar = sg.ProgressBar(max_value=100,orientation='h',key='--PROGRESSBAR--',expand_x=True,size=(40,8),bar_color=("green",FN_MAIN_COLOUR))
 
 layout = [
@@ -23,10 +23,13 @@ layout = [
                 sg.Tab('Filter Visualization',t3, key="--FV--")
             ]],key="--TAB--")
     ],
-    [sg.Button(button_text="FIRE", expand_y=True, expand_x=True,key='--fire--'), sg.Frame(title="",layout=[
+    [sg.Frame(title="", border_width=0, layout=[
+        [sg.Button(button_text="FIRE", expand_y=True, expand_x=True, key='--fire--')],
+        [sg.Button(button_text="STOP", expand_y=True, expand_x=True, key='--stop--', button_color='red')]
+    ]), sg.Frame(title="",layout=[
         [progress_bar],
         [console]
-    ])]   # ,console
+    ], expand_x=True)]
 ]
 
 window = sg.Window('FlavNET', layout, default_element_size=(12,1))
@@ -36,11 +39,14 @@ while True:
 
     ClearConsole(console)
 
+    if event == '--stop--': print("STOP")
+
     if values["--TAB--"] == "--IR--":
         IR.inverseRepresentatorHandler.HandleEvent(event,values,window,console,progress_bar)
     if values["--TAB--"] == "--FV--":
         FV.filterVisualizationHandler.HandleEvent(event,values,window,console,progress_bar)
-
+    if values["--TAB--"] == "--DD--":
+        DD.deepDreamHandler.HandleEvent(event,values,window,console,progress_bar)
 
 
     if event == sg.WIN_CLOSED:  # always,  always give a way out!

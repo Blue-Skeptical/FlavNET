@@ -46,10 +46,17 @@ class InverseRepresentatorHandler:
         self.filter = 0
         self.regularization = 0
 
+        self.ir = InverseRepresentation()
+
     def HandleEvent(self,event,values,window, console,progress_bar):
+        #STOP
+        if event == '--stop--':
+            self.ir.Stop()
+            return
         #LOAD TARGET IMAGE
         if event == "load_target_image":
             self.target_filename = sg.popup_get_file('file to open', no_window=True)
+            if self.target_filename == "": return
 
             if self.target_filename.split('.')[1] != 'jpg' and self.target_filename.split('.')[1] != 'jpeg' and self.target_filename.split('.')[1] != 'png':
                 print('Select .png .jpeg .jpg')
@@ -62,6 +69,7 @@ class InverseRepresentatorHandler:
         #LOAD INPUT IMAGE
         if event == "load_input_image":
             self.input_filename = sg.popup_get_file('file to open', no_window=True)
+            if self.input_filename == "": return
 
             if self.input_filename.split('.')[1] != 'jpg' and self.input_filename.split('.')[1] != 'jpeg' and self.input_filename.split('.')[1] != 'png':
                 print('Select .png .jpeg .jpg')
@@ -133,11 +141,12 @@ class InverseRepresentatorHandler:
             print('Select an input image')
             return 0
 
-        ir = InverseRepresentation(self.target_filename,self.input_filename,self.image_size,self.epoch,
+        self.ir.LoadParam(self.target_filename,self.input_filename,self.image_size,self.epoch,
                                    self.learning_rate, self.optimizer, self.weight_decay, self.momentum,
                                    self.net, self.layer, self.filter, self.regularization, FunctionalMode.InverseRepresentation,
                                    window, ou_img, console, progress_bar)
-        ir.Fire()
+
+        self.ir.Fire()
 
 inverseRepresentatorHandler = InverseRepresentatorHandler()
 
