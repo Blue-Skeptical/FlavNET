@@ -62,7 +62,7 @@ class DeepDreamHandler:
                 return 0
             else:
                 window['--{:s}_input_image--'.format(PREFIX)].update(data=GU.OpenImage(self.input_filename,(220,220)))
-        if event == "set_target_random":
+        if event == "set_input_random":
             window['--{:s}_input_image--'.format(PREFIX)].update(data = GU.OpenImage("",(220,220),rand=True))
             self.input_filename = "RANDOM"
         #if FIRE

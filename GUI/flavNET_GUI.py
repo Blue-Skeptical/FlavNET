@@ -39,8 +39,6 @@ while True:
 
     ClearConsole(console)
 
-    if event == '--stop--': print("STOP")
-
     if values["--TAB--"] == "--IR--":
         IR.inverseRepresentatorHandler.HandleEvent(event,values,window,console,progress_bar)
     if values["--TAB--"] == "--FV--":
