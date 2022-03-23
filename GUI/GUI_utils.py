@@ -1,8 +1,8 @@
 import PIL
 import PySimpleGUI as sg
 import torch
-from GUI_utils import *
-from colours_scheme import *
+
+import nn_utils
 from nn_utils import *
 from PIL import Image
 import copy
@@ -42,6 +42,35 @@ def GetEpochLayer(prefix, getFrameOnly = False):
     if getFrameOnly:
         return copy.deepcopy(frame)
     return copy.deepcopy(l_epoch)
+
+def GetPyramidParameters(prefix, getFrameOnly = False):
+    key1 = '--{:s}_pyramid_depth--'.format(prefix)
+    key2 = '--{:s}_pyramid_multiplier--'.format(prefix)
+    frame = sg.Frame(title="Pyramid", layout=[
+        [sg.Text("Depth", justification='l'), sg.Text("Multiplier",justification='r',expand_x=True)],
+        [sg.Slider((1,8),resolution=1,tick_interval=4, expand_x=True, key=key1, orientation='h'),
+         sg.Slider((1,3),resolution=0.2,tick_interval=1, expand_x=True, key=key2, orientation='h')]
+    ], expand_x=True)
+    l_pyramid = []
+    l_pyramid.append([frame])
+    if getFrameOnly:
+        return copy.deepcopy(frame)
+    return copy.deepcopy(l_pyramid)
+
+def GetLossFunction(prefix, getFrameOnly = False):
+    key1 = '--{:s}_loss_functions_MEAN--'.format(prefix)
+    key2 = '--{:s}_loss_function_MSE'
+    frame = sg.Frame(title="Loss function", layout=[
+        [sg.Radio('MEAN', 'loss_fun', size=(12, 1), key=key1),
+         sg.Radio('MSE', 'loss_fun', size=(12, 1), key=key2)],
+    ],expand_x=True)
+    l_loss = []
+    l_loss.append([frame])
+    if getFrameOnly:
+        return copy.deepcopy(frame)
+    return copy.deepcopy(l_loss)
+
+
 
 def GetLearningRateLayer(prefix, getFrameOnly = False):
     key = '--{:s}_learning_rate--'.format(prefix)
@@ -153,6 +182,14 @@ def OpenImage(file_or_bytes, resize=None, rand = False):
     img.save(bio, format="PNG")
     del img
     return bio.getvalue()
+
+def PrintOnOutputFrame(tensor, sgImage):
+    if sgImage is not None:
+        bio = io.BytesIO()
+        img = nn_utils.GetImageFromTensor(tensor).save(bio, format="PNG")
+        del img
+        sgImage.update(data=OpenImage(bio.getvalue(), (220, 220)), size =(220,220))  #GUI.GUI_utils.OpenImage(bio.getvalue(), (220, 220))
+
 
 def ClearConsole(console):
     console.update("")
