@@ -29,7 +29,12 @@ device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 class OptimizerSelector(Enum):
     ADAM = 1,
-    SGD = 2
+    SGD = 2,
+    GD = 3
+
+class Losses(Enum):
+    MEAN = 1,
+    MSE = 2
 
 class FunctionalMode(Enum):
     InverseRepresentation = 1,
@@ -38,6 +43,29 @@ class FunctionalMode(Enum):
 class PretrainedNet(Enum):
     vgg16 = 1,
     vgg19 = 2
+
+class GDOptimizer():
+    def __init__(self,params,lr,direction='positive'):
+        self.params = params
+        self.lr = lr
+        self.direction = direction
+
+    def zero_grad(self):
+        for p in self.params:
+            p.grad.data = torch.zeros_like(p.grad)
+
+    @torch.no_grad()
+    def step(self):
+        if self.direction == 'positive':
+            for p in self.params:
+                p.data += p.grad.data * self.lr
+        elif self.direction == 'negative':
+            for p in self.params:
+                p.data -= p.grad.data * self.lr
+
+
+
+
 
 # Resize input images at <imsize * imsize> pixels
 # and transform into torch sensor

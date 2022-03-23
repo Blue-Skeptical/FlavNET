@@ -100,13 +100,6 @@ class InverseRepresentation():
         elif self.optim is OptimizerSelector.SGD:
             self.optimizer = optim.SGD([self.input_image], lr=self.lr, momentum=self.momentum, weight_decay=self.weight_decay)
 
-    def PrintOnOutputFrame(self,tensor):
-        if self.ou_img is not None:
-            bio = io.BytesIO()
-            img = GetImageFromTensor(tensor).save(bio, format="PNG")
-            del img
-            self.ou_img.update(data=GUI.GUI_utils.OpenImage(bio.getvalue(), (220, 220)), size =(220,220))  #GUI.GUI_utils.OpenImage(bio.getvalue(), (220, 220))
-
     def Visualization(self):
         start_time = time.time()
         current_time = start_time
@@ -148,7 +141,8 @@ class InverseRepresentation():
                 current_time = time.time()
                 _save_tensor = self.input_image.detach()
                 SaveImage(_save_tensor, "./generated/{:d}_{:s}".format(i, "STEP.jpg"))
-                self.PrintOnOutputFrame(_save_tensor)
+#                PrintOnOutputFrame(_save_tensor)
+                PrintOnOutputFrame(_save_tensor,self.ou_img)
                 #ClearConsole(self.console)
 
             self.loss.backward()
@@ -182,7 +176,7 @@ class TargetRepresentationLevel(nn.Module):
 
     def forward(self, image):
         if self.filterSelected != 0:
-            self.currentRep = image[0, self.filterSelected, :, :]
+            self.currentRep = image[0, self.filterSelected-1, :, :]
         else:
             self.currentRep = image
 

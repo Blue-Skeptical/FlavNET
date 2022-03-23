@@ -104,13 +104,6 @@ class FilterVisualization():
         elif self.optim is OptimizerSelector.SGD:
             self.optimizer = optim.SGD([self.input_image], lr=self.lr, momentum=self.momentum, weight_decay=self.weight_decay)
 
-    def PrintOnOutputFrame(self,tensor):
-        if self.ou_img is not None:
-            bio = io.BytesIO()
-            img = GetImageFromTensor(tensor).save(bio, format="PNG")
-            del img
-            self.ou_img.update(data=GUI.GUI_utils.OpenImage(bio.getvalue(), (220, 220)), size =(220,220))  #GUI.GUI_utils.OpenImage(bio.getvalue(), (220, 220))
-
     def Visualization(self):
         start_time = time.time()
         current_time = start_time
@@ -134,7 +127,7 @@ class FilterVisualization():
                 current_time = time.time()
                 _save_tensor = self.input_image.detach()
                 SaveImage(_save_tensor, "./generated/{:d}_{:s}".format(i, "STEP.jpg"))
-                self.PrintOnOutputFrame(_save_tensor)
+                PrintOnOutputFrame(_save_tensor,self.ou_img)
 
             self.loss.backward()
             self.optimizer.step()
