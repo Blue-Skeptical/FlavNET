@@ -148,7 +148,7 @@ class FilterVisualization():
             self.loss = -torch.mean(current_rep)
 
             if i % 50 == 0:
-                ClearConsole(self.console)
+                GUI.GUI_utils.ClearConsole(self.console)
                 print("Loss " + str(i) + ": " + "{:.4f}".format(self.loss.item()) + "\t-----> {:.2f} s".format(
                     time.time() - current_time))
                 current_time = time.time()

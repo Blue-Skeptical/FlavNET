@@ -15,8 +15,8 @@ t3 = FV.layout  #Filter Visualization
 console = sg.Output(size=(95,3), key = '--OUTPUT--', expand_x=True)
 progress_bar = sg.ProgressBar(max_value=100,orientation='h',key='--PROGRESSBAR--',expand_x=True,size=(40,8),bar_color=("green",FN_MAIN_COLOUR))
 
-layout = [
-    [sg.TabGroup(
+
+col = [[sg.TabGroup(
             [[
                 sg.Tab("Inverse Representation", t1, key= "--IR--"),
                 sg.Tab('Deep Dream', t2, key= "--DD--"),
@@ -26,13 +26,19 @@ layout = [
     [sg.Frame(title="", border_width=0, layout=[
         [sg.Button(button_text="FIRE", expand_y=True, expand_x=True, key='--fire--')],
         [sg.Button(button_text="STOP", expand_y=True, expand_x=True, key='--stop--', button_color='red')]
-    ]), sg.Frame(title="",layout=[
+    ]), sg.Frame(title="", layout=[
         [progress_bar],
         [console]
-    ], expand_x=True)]
+    ], expand_x=True)]]
+
+
+layout = [
+    [sg.Column(col, scrollable=True, size=(775,700), vertical_scroll_only=True)]
 ]
 
-window = sg.Window('FlavNET', layout, default_element_size=(12,1))
+window = sg.Window('FlavNET', layout, default_element_size=(12,1), resizable=False)
+
+
 
 while True:
     event, values = window.read()
