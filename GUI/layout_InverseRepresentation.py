@@ -12,6 +12,7 @@ PREFIX = "IR"
 
 # Parameter needed for GUI
 ou_img = sg.Image()
+description = 'La rappresentazione inversa mira a migliorare\n una immagine input per matchare\n un output target dato'
 
 layout = []
 frame = sg.Frame(title="Parameters", layout=[
@@ -29,9 +30,9 @@ frame_preview = sg.Frame(title="I/O", layout=[
     [sg.Frame(title='Output image', vertical_alignment='t', layout=[[ou_img]], size=(220, 220))]
 ], vertical_alignment='t')
 
-frame_logo = GetLogoAndDescription(getFrameOnly=True, description='Inverse representation ciao ciao \n CIAO ANCHE  A TE')
+frame_logo = GetLogoAndDescription(getFrameOnly=True, description=description)
 
-frame_logo_parameters = sg.Frame(title='', border_width=2, layout=[
+frame_logo_parameters = sg.Frame(title='', border_width=0, layout=[
     [frame_logo],
     [frame]
 ], vertical_alignment='b', expand_y=True)

@@ -32,7 +32,7 @@ layout = [
     ], expand_x=True)]
 ]
 
-window = sg.Window('FlavNET', layout, default_element_size=(12,1))
+window = sg.Window('FlavNET', layout, default_element_size=(12,1),icon='../logo.png')
 
 while True:
     event, values = window.read()

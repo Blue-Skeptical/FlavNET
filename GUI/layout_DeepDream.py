@@ -27,6 +27,11 @@ frame_preview = sg.Frame(title="I/O", layout=[
     [sg.Frame(title='Output image', vertical_alignment='t', layout=[[ou_img]], size=(220, 220))]
 ], vertical_alignment='b')
 
+frame_logo_description = sg.Frame(title='', layout=[
+    [GU.GetLogoAndDescription(getFrameOnly=True, description='DEEP DREAMING DESCRIPTION')]
+], border_width=0)
+
+layout.append([frame_logo_description])
 layout.append([frame,frame_preview])
 
 class DeepDreamHandler:

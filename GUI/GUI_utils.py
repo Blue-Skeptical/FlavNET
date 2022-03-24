@@ -72,7 +72,7 @@ def GetLossFunction(prefix, getFrameOnly = False):
 
 def GetLogoAndDescription(getFrameOnly = False, description = ''):
     frame = sg.Frame(title='', border_width=0, layout=[
-        [sg.Image('../logo.png', sg.VerticalSeparator()), sg.Text(description)]
+        [sg.Image('../logo.png'),  sg.VerticalSeparator(), sg.Text(description, justification='c', expand_x=True)]
     ], vertical_alignment='t')
     l_ld =[]
     l_ld.append([frame])

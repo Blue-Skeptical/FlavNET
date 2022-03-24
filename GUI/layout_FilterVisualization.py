@@ -25,9 +25,17 @@ frame_preview = sg.Frame(title="I/O", layout=[
     [sg.Frame(title='Input image',right_click_menu=GU.GetImageMenu("input"), vertical_alignment='t', layout=[[sg.Image(key='--{:s}_input_image--'.format(PREFIX))]], size=(220, 220))],
     [sg.HorizontalSeparator()],
     [sg.Frame(title='Output image', vertical_alignment='t', layout=[[ou_img]], size=(220, 220))]
-], vertical_alignment='b')
+], vertical_alignment='t')
 
-layout.append([frame,frame_preview])
+frame_logo = GetLogoAndDescription(getFrameOnly=True, description='FILTER VISUALIZATION DESCRIPTION')
+
+frame_logo_parameters = sg.Frame(title='', border_width=0, layout=[
+    [frame_logo],
+    [frame]
+], vertical_alignment='b', expand_y=True)
+
+
+layout.append([frame_logo_parameters,frame_preview])
 
 class FilterVisualizationHandler:
     def __init__(self):
