@@ -70,7 +70,15 @@ def GetLossFunction(prefix, getFrameOnly = False):
         return copy.deepcopy(frame)
     return copy.deepcopy(l_loss)
 
-
+def GetLogoAndDescription(getFrameOnly = False, description = ''):
+    frame = sg.Frame(title='', border_width=0, layout=[
+        [sg.Image('../logo.png', sg.VerticalSeparator()), sg.Text(description)]
+    ], vertical_alignment='t')
+    l_ld =[]
+    l_ld.append([frame])
+    if getFrameOnly:
+        return copy.deepcopy(frame)
+    return copy.deepcopy(l_ld)
 
 def GetLearningRateLayer(prefix, getFrameOnly = False):
     key = '--{:s}_learning_rate--'.format(prefix)
@@ -123,7 +131,7 @@ def GetRegularizationLayer(prefix,getFrameOnly=False):
     frame = sg.Frame(title="Regularization", layout=[
         [sg.Text("Regularization weight", justification='c',expand_x=True)],
         [sg.Input(key=key, justification='c',expand_x=True)]
-    ], expand_x=True, expand_y=True)
+    ], expand_x=True, expand_y=False)
     l_reg = []
     l_reg.append([frame])
     if getFrameOnly:

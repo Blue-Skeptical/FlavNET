@@ -20,16 +20,23 @@ frame = sg.Frame(title="Parameters", layout=[
     [GU.GetOptimizerLayer(PREFIX,getFrameOnly=True)],
     [GU.GetNetLayer(PREFIX,getFrameOnly=True)],
     [GU.GetRegularizationLayer(PREFIX,True)]
-],vertical_alignment='bottom')
+],vertical_alignment='b')
 
 frame_preview = sg.Frame(title="I/O", layout=[
     [sg.Frame(title='Target image', right_click_menu=GU.GetImageMenu("target"), vertical_alignment='t', layout=[[sg.Image(key='--{:s}_target_image--'.format(PREFIX))]], size=(220, 220))],
     [sg.Frame(title='Input image',right_click_menu=GU.GetImageMenu("input"), vertical_alignment='t', layout=[[sg.Image(key='--{:s}_input_image--'.format(PREFIX))]], size=(220, 220))],
     [sg.HorizontalSeparator()],
     [sg.Frame(title='Output image', vertical_alignment='t', layout=[[ou_img]], size=(220, 220))]
-])
+], vertical_alignment='t')
 
-layout.append([frame,frame_preview])
+frame_logo = GetLogoAndDescription(getFrameOnly=True, description='Inverse representation ciao ciao \n CIAO ANCHE  A TE')
+
+frame_logo_parameters = sg.Frame(title='', border_width=2, layout=[
+    [frame_logo],
+    [frame]
+], vertical_alignment='b', expand_y=True)
+
+layout.append([frame_logo_parameters,frame_preview])
 
 class InverseRepresentatorHandler:
     def __init__(self):
