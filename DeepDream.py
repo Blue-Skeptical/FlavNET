@@ -1,11 +1,14 @@
+import threading
+
 import matplotlib.pyplot as plt
 import torch
 
 import nn_utils
 from nn_utils import *
 
-class DeepDream():
+class DeepDream(Thread):
     def __init__(self):
+        super(DeepDream,self).__init__()
         self.stop = False
         self.in_img_name = None
         self.img_size = None
@@ -62,6 +65,7 @@ class DeepDream():
         self.model = None
         self.optim = None
         self.target_representation_level = None
+
         IMAGENET_MEAN_1 = np.array([0.485, 0.456, 0.406], dtype=np.float32)
         IMAGENET_STD_1 = np.array([0.229, 0.224, 0.225], dtype=np.float32)
         self.LOWER_IMAGE_BOUND = torch.tensor((-IMAGENET_MEAN_1 / IMAGENET_STD_1).reshape(1, -1, 1, 1)).to(device)
@@ -72,7 +76,6 @@ class DeepDream():
             self.pretrained_net = models.vgg19(pretrained=True).features.to(device).eval()
         elif self.net == PretrainedNet.vgg16:
             self.pretrained_net = models.vgg16(pretrained=True).features.to(device).eval()
-
         loader = GetLoader(self.img_size)
 
         if self.in_img_name == 'RANDOM':
@@ -94,7 +97,7 @@ class DeepDream():
             print("Pretrained net has only {:d} layers! Not {:d}".format(self.pretrained_net.children(),self.layer))
             return False
 
-        for i,layer in enumerate(self.pretrained_net.children()):
+        for i, layer in enumerate(self.pretrained_net.children()):
             if isinstance(layer, nn.ReLU):
                 self.model.add_module('layer_' + str(i), nn.ReLU(inplace=False))
             else:
@@ -141,7 +144,7 @@ class DeepDream():
             self.input_tensor = GetTensorFromImage(self.input_image, require_grad=True)
 
             for i in range(0, self.epoch):
-                if self.stop: return
+                if self.stop: break
                 if self.progress_bar is not None:
                     self.progress_bar.update((i + l*self.epoch)*100/(self.epoch*self.p_dept))
 
@@ -190,7 +193,7 @@ class DeepDream():
         if self.progress_bar is not None:
             self.progress_bar.update(0)
 
-    def Fire(self):
+    def run(self):
         self.stop = False
         self.InitInput()
         if not self.InitModel():

@@ -54,12 +54,13 @@ class InverseRepresentatorHandler:
         self.filter = 0
         self.regularization = 0
 
-        self.ir = InverseRepresentation()
+        self.ir = None
 
     def HandleEvent(self,event,values,window, console,progress_bar):
         #STOP
         if event == '--stop--':
             self.ir.Stop()
+            self.ir.join()
             return
         #LOAD TARGET IMAGE
         if event == "load_target_image":
@@ -149,12 +150,13 @@ class InverseRepresentatorHandler:
             print('Select an input image')
             return 0
 
+        self.ir = InverseRepresentation()
         self.ir.LoadParam(self.target_filename,self.input_filename,self.image_size,self.epoch,
                                    self.learning_rate, self.optimizer, self.weight_decay, self.momentum,
                                    self.net, self.layer, self.filter, self.regularization, FunctionalMode.InverseRepresentation,
                                    window, ou_img, console, progress_bar)
 
-        self.ir.Fire()
+        self.ir.start()
 
 inverseRepresentatorHandler = InverseRepresentatorHandler()
 

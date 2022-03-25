@@ -49,12 +49,13 @@ class DeepDreamHandler:
         self.filter = 0
         self.pyramid_depth = 1
         self.pyramid_mul = 1
-        self.dd = DeepDream()
+        self.dd = None
 
     def HandleEvent(self,event,values,window,console,progress_bar):
         #STOP
         if event == '--stop--':
             self.dd.Stop()
+            self.dd.join()
             return
         # Input Image
         if event == "load_input_image":
@@ -131,11 +132,14 @@ class DeepDreamHandler:
         if self.input_filename == "":
             print('Select an input image')
             return 0
+
+        self.dd = DeepDream()
         self.dd.LoadParam(self.input_filename, self.image_size, self.epoch,
                        self.pyramid_depth, self.pyramid_mul, self.learning_rate, self.optimizer,
                        self.weight_decay, self.momentum,self.loss, self.net, self.layer,self.filter,
                        window,ou_img,console,progress_bar)
-        self.dd.Fire()
+
+        self.dd.start()
 
 deepDreamHandler = DeepDreamHandler()
 

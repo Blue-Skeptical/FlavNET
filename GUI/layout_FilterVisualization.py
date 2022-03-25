@@ -52,12 +52,13 @@ class FilterVisualizationHandler:
         self.filter = 0
         self.regularization = 0
 
-        self.fv = FilterVisualization()
+        self.fv = None
 
     def HandleEvent(self,event,values,window, console, progress_bar):
         #STOP
         if event == '--stop--':
             self.fv.Stop()
+            self.fv.join()
             return
         #LOAD INPUT IMAGE
         if event == "load_input_image":
@@ -123,12 +124,13 @@ class FilterVisualizationHandler:
             print('Select an input image')
             return 0
 
+        self.fv = FilterVisualization()
         self.fv.LoadParam(self.input_filename,self.image_size,self.epoch,
                                    self.learning_rate, self.optimizer, self.weight_decay, self.momentum,
                                    self.net, self.layer, self.filter, FunctionalMode.FilterVisualization,
                                    window, ou_img, console, progress_bar)
 
-        self.fv.Fire()
+        self.fv.start()
 
 filterVisualizationHandler = FilterVisualizationHandler()
 

@@ -11,8 +11,9 @@ GUIDA:
     -   Per effettuare visualizzazione dei filtri e una semplice deepdream (senza pyramid) selezionare
         FunctionalMode.FilterVisualization.     
 '''
-class InverseRepresentation():
+class InverseRepresentation(Thread):
     def __init__(self):
+        super(InverseRepresentation,self).__init__()
         self.stop = False
         self.tg_img_name = None       # Target image name
         self.in_img_name = None       # Input file name
@@ -146,7 +147,7 @@ class InverseRepresentation():
                     target_rep = target_rep[0,self.filter-1,:,:]
 
         for i in range(0, self.epoch):
-            if self.stop: return
+            if self.stop: break
             if self.progress_bar:
                 self.progress_bar.update(i*100/self.epoch)
 
@@ -190,7 +191,7 @@ class InverseRepresentation():
         if self.progress_bar is not None:
             self.progress_bar.update(0)
 
-    def Fire(self):
+    def run(self):
         self.stop = False
         self.InitInput()
         if not self.InitModel():

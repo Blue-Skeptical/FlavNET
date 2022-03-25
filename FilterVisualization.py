@@ -11,8 +11,9 @@ GUIDA:
     -   Per effettuare visualizzazione dei filtri e una semplice deepdream (senza pyramid) selezionare
         FunctionalMode.FilterVisualization.     
 '''
-class FilterVisualization():
+class FilterVisualization(Thread):
     def __init__(self):
+        super(FilterVisualization,self).__init__()
         self.stop = False
         self.in_img_name = None       # Input file name
         self.img_size = None        # Image size
@@ -135,7 +136,7 @@ class FilterVisualization():
         current_time = start_time
 
         for i in range(0, self.epoch):
-            if self.stop: return
+            if self.stop: break
             if self.progress_bar:
                 self.progress_bar.update(i*100/self.epoch)
             current_output = self.model(self.input_image)
@@ -171,7 +172,7 @@ class FilterVisualization():
         if self.progress_bar is not None:
             self.progress_bar.update(0)
 
-    def Fire(self):
+    def run(self):
         self.stop = False
         self.InitInput()
         if not self.InitModel():
