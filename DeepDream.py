@@ -79,15 +79,11 @@ class DeepDream(Thread):
         loader = GetLoader(self.img_size)
 
         if self.in_img_name == 'RANDOM':
-#            self.input_image = torch.rand([1,3,self.img_size,self.img_size], requires_grad=True, device=device)
             self.input_image = torch.rand([self.img_size, self.img_size,3]).detach().numpy()
             self.input_tensor = GetTensorFromImage(self.input_image, require_grad=True)
         else:
             self.input_image = np.asarray(GetImageReshapedFromFile(self.in_img_name,loader))
             self.input_tensor = GetTensorFromImage(self.input_image, require_grad=True)
-#            self.input_image = LoadTensorFromFile(self.in_img_name,loader)
-#            self.input_image.requires_grad_(True)
-#            self.input_image = self.input_image.to(device)
 
     def InitModel(self):
         self.model = nn.Sequential().to(device)
@@ -209,6 +205,7 @@ class TargetRepresentationLevel(nn.Module):
     def forward(self, image):
         if self.filterSelected != 0:
             self.currentRep = image[0, self.filterSelected, :, :]
+            #self.currentRep = image[0, 0:50,:,:]
         else:
             self.currentRep = image
 
@@ -216,8 +213,9 @@ class TargetRepresentationLevel(nn.Module):
 
 
 
-#a = DeepDream("./images/gatto.jpg",128,100,3,1.5,0.5,OptimizerSelector.GD,0,0,Losses.MEAN,PretrainedNet.vgg16,0,0,None,None,None,None)
-#a.Fire()
+#a = DeepDream()
+#a.LoadParam("./images/cane.jpg",256,200,3,1.5,0.01,OptimizerSelector.ADAM,0,0,Losses.MEAN,PretrainedNet.vgg16,6,slice(5,10),None,None,None,None)
+#a.run()
 
 
 # ____________________________________.

@@ -119,7 +119,7 @@ class DeepDreamHandler:
         # </editor-fold>
         # <editor-fold desc="Pyramid">
         self.pyramid_depth = int((values['--{:s}_pyramid_depth--'.format(PREFIX)]))
-        self.pyramid_mul = int((values['--{:s}_pyramid_multiplier--'.format(PREFIX)]))
+        self.pyramid_mul = float((values['--{:s}_pyramid_multiplier--'.format(PREFIX)]))
         # </editor-fold>
         # <editor-fold desc="Loss">
         if values['--{:s}_loss_function_MEAN--'.format(PREFIX)]: self.loss = Losses.MEAN

@@ -172,9 +172,8 @@ class InverseRepresentation(Thread):
                 current_time = time.time()
                 _save_tensor = self.input_image.detach()
                 SaveImage(_save_tensor, "./generated/{:d}_{:s}".format(i, "STEP.jpg"))
-#                PrintOnOutputFrame(_save_tensor)
-                PrintOnOutputFrame(_save_tensor,self.ou_img)
-                #ClearConsole(self.console)
+                if self.ou_img is not None:
+                    PrintOnOutputFrame(_save_tensor,self.ou_img)
 
             self.loss.backward()
             self.optimizer.step()
@@ -205,6 +204,7 @@ class TargetRepresentationLevel(nn.Module):
         super(TargetRepresentationLevel, self).__init__()
         if filter_selected != 0:
             self.targetRep = target[0, filter_selected-1, :, :].detach()
+            #self.targetRep = target[0, 150:170, :, :].detach()
         else:
             self.targetRep = target.detach()
 
@@ -214,6 +214,7 @@ class TargetRepresentationLevel(nn.Module):
     def forward(self, image):
         if self.filterSelected != 0:
             self.currentRep = image[0, self.filterSelected-1, :, :]
+            #self.currentRep = image[0, 150:170, :, :]
         else:
             self.currentRep = image
 
@@ -231,9 +232,10 @@ class NormalizationLevel(nn.Module):
 
 
 
-#i = InverseRepresentation("./images/dune.jpg","RANDOM",64,200,0.2,OptimizerSelector.ADAM,
-#                          0.001,0,PretrainedNet.vgg16,10,0,0.001,FunctionalMode.InverseRepresentation)
-#i.Fire()
+#i = InverseRepresentation()
+#i.LoadParam("./images/us.jpg","RANDOM",512,400,0.02,OptimizerSelector.ADAM,
+#                          0,0,PretrainedNet.vgg16,15,2,0,FunctionalMode.InverseRepresentation,None,None,None,None)
+#i.run()
 # ____________________________________.
 # __________ INPUT ___________________|
 # <editor-fold desc="INPUT">
