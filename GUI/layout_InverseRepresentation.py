@@ -126,10 +126,19 @@ class InverseRepresentatorHandler:
             print("Layer must be int")
             return 0
         if (values['--{:s}_filter--'.format(PREFIX)]).isnumeric():
-            self.filter = int((values['--{:s}_filter--'.format(PREFIX)]))
+            self.filter = slice(int((values['--{:s}_filter--'.format(PREFIX)])),
+                                int((values['--{:s}_filter--'.format(PREFIX)])) + 1)
         else:
-            print("Layer must be int")
-            return 0
+            try:
+                _start,_stop = values['--{:s}_filter--'.format(PREFIX)].split(',')
+                if _start.isnumeric() and _stop.isnumeric():
+                    self.filter = slice(int(_start),int(_stop))
+                else:
+                    print("Filters must be int")
+                    return 0
+            except:
+                print("Insert a number(int) or a range(int,int) as filter!")
+                return 0
         # </editor-fold>
         # <editor-fold desc="Regularization">
         try:

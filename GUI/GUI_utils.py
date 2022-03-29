@@ -1,8 +1,5 @@
 import PIL
 import PySimpleGUI as sg
-import torch
-
-import nn_utils
 from nn_utils import *
 from PIL import Image
 import copy
@@ -194,7 +191,7 @@ def OpenImage(file_or_bytes, resize=None, rand = False):
 def PrintOnOutputFrame(tensor, sgImage):
     if sgImage is not None:
         bio = io.BytesIO()
-        img = nn_utils.GetImageFromTensor(tensor).save(bio, format="PNG")
+        img = GetImageFromTensor(tensor).save(bio, format="PNG")
         del img
         sgImage.update(data=OpenImage(bio.getvalue(), (220, 220)), size =(220,220))  #GUI.GUI_utils.OpenImage(bio.getvalue(), (220, 220))
 

@@ -114,15 +114,34 @@ class InverseRepresentation(Thread):
             if self.layer - 1 == i:
                 print("____ TARGET LAYER AFTER LAYER " + str(i) + ": " + str(list(self.model.modules())[i]))
                 _target = self.model(self.target_image).detach()
-                if self.filter-1 > _target.size()[1]:
-                    logging.error("Target representation has only {:d} filter, "
-                                  "but you selected filter number {:d}".format(_target.size()[1], self.filter))
+                if _target.size()[1] < self.filter.start:
+                    print("Selected layer has only {:d} filters! Not {:d}".format(_target.size()[1], self.filter.start))
                     return False
-                self.target_representation_level = TargetRepresentationLevel(_target, filter_selected=self.filter)
-                self.model.add_module("layer_" + str(i + 1), self.target_representation_level)
+                if _target.size()[1] < self.filter.stop -1:
+                    print("Selected layer has only {:d} filters! Not {:d}".format(_target.size()[1], self.filter.stop))
+                    return False
+                self.target_representation_level = TargetRepresentationLevel(_target, filter_selected=slice(
+                    self.filter.start - 1,
+                    self.filter.stop - 1))
+                self.model.add_module("final_layer", self.target_representation_level)
                 break
+
+        if self.layer == 0:
+            _target = self.model(self.target_image).detach()
+            if _target.size()[1] < self.filter.start:
+                print("Selected layer has only {:d} filters! Not {:d}".format(_target.size()[1], self.filter.start))
+                return False
+            if _target.size()[1] < self.filter.stop -1:
+                print("Selected layer has only {:d} filters! Not {:d}".format(_target.size()[1], self.filter.stop))
+                return False
+            self.target_representation_level = TargetRepresentationLevel(_target, filter_selected=slice(self.filter.start -1,
+                                                                                                        self.filter.stop -1))
+            self.model.add_module("final_layer", self.target_representation_level)
+
         self.model.requires_grad_(False)
         return True
+
+
 
     def InitOptimizer(self):
         if self.optim is OptimizerSelector.ADAM:
@@ -134,17 +153,7 @@ class InverseRepresentation(Thread):
         start_time = time.time()
         current_time = start_time
 
-        if self.layer != 0:
-            target_rep = self.target_representation_level.targetRep
-        else:
-            print("____ TARGET LAYER AT THE OUTPUT ____")
-            target_rep = self.model(self.target_image).detach()
-            if self.filter != 0:
-                if target_rep.size()[1] < self.filter-1:
-                    print("We have {:d} filters available at this level, not {:d}".format(target_rep.size()[1],self.filter))
-                    return
-                else:
-                    target_rep = target_rep[0,self.filter-1,:,:]
+        target_rep = self.target_representation_level.targetRep
 
         for i in range(0, self.epoch):
             if self.stop: break
@@ -153,12 +162,7 @@ class InverseRepresentation(Thread):
 
             current_output = self.model(self.input_image)
 
-            if self.layer == 0 and self.filter == 0:
-                current_rep = current_output
-            elif self.layer == 0 and self.filter != 0:
-                current_rep = current_output[0,self.filter,:,:]
-            else:
-                current_rep = self.target_representation_level.currentRep
+            current_rep = self.target_representation_level.currentRep
 
             if self.modality is FunctionalMode.InverseRepresentation:
                 regularise = ((self.input_image.view(-1)) ** 6).sum() * self.regularization
@@ -202,9 +206,8 @@ class InverseRepresentation(Thread):
 class TargetRepresentationLevel(nn.Module):
     def __init__(self, target, filter_selected = None):
         super(TargetRepresentationLevel, self).__init__()
-        if filter_selected != 0:
-            self.targetRep = target[0, filter_selected-1, :, :].detach()
-            #self.targetRep = target[0, 150:170, :, :].detach()
+        if filter_selected.start != -1:
+            self.targetRep = target[0, filter_selected, :, :].detach()
         else:
             self.targetRep = target.detach()
 
@@ -212,9 +215,8 @@ class TargetRepresentationLevel(nn.Module):
         self.filterSelected = filter_selected
 
     def forward(self, image):
-        if self.filterSelected != 0:
-            self.currentRep = image[0, self.filterSelected-1, :, :]
-            #self.currentRep = image[0, 150:170, :, :]
+        if self.filterSelected.start != -1:
+            self.currentRep = image[0, self.filterSelected, :, :]
         else:
             self.currentRep = image
 

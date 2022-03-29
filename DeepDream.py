@@ -102,19 +102,27 @@ class DeepDream(Thread):
             if self.layer - 1 == i:
                 print("___ TARGET LAYER {:d} AFTER {:s}".format(i,str(list(self.model.modules())[i])))
                 _temp = self.model(self.input_tensor)
-                if _temp.size()[1] < self.filter:
-                    print("Selected layer has only {:d} filters! Not {:d}".format(_temp.size()[1], self.filter))
+                if _temp.size()[1] < self.filter.start:
+                    print("Selected layer has only {:d} filters! Not {:d}".format(_temp.size()[1], self.filter.start))
                     return False
-                self.target_representation_level = TargetRepresentationLevel(filter_selected= self.filter -1)
+                if _temp.size()[1] < self.filter.stop - 1:
+                    print("Selected layer has only {:d} filters! Not {:d}".format(_temp.size()[1], self.filter.start))
+                    return False
+                self.target_representation_level = TargetRepresentationLevel(filter_selected= slice(self.filter.start -1,
+                                                                                                    self.filter.stop - 1))
                 self.model.add_module('layer_final', self.target_representation_level)
                 break
 
         if self.layer == 0:
             _temp = self.model(self.input_tensor)
-            if _temp.size()[1] < self.filter:
-                print("Selected layer has only {:d} filters! Not {:d}".format(_temp.size()[1], self.filter))
+            if _temp.size()[1] < self.filter.start:
+                print("Selected layer has only {:d} filters! Not {:d}".format(_temp.size()[1], self.filter.start))
                 return False
-            self.target_representation_level = TargetRepresentationLevel(filter_selected= self.filter)
+            if _temp.size()[1] < self.filter.stop - 1:
+                print("Selected layer has only {:d} filters! Not {:d}".format(_temp.size()[1], self.filter.start))
+                return False
+            self.target_representation_level = TargetRepresentationLevel(filter_selected=slice(self.filter.start - 1,
+                                                                                               self.filter.stop - 1))
             self.model.add_module('layer_final', self.target_representation_level)
 
         return True
@@ -203,9 +211,8 @@ class TargetRepresentationLevel(nn.Module):
         self.filterSelected = filter_selected
 
     def forward(self, image):
-        if self.filterSelected != 0:
+        if self.filterSelected.start != -1:
             self.currentRep = image[0, self.filterSelected, :, :]
-            #self.currentRep = image[0, 0:50,:,:]
         else:
             self.currentRep = image
 

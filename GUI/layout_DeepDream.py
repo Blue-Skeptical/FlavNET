@@ -109,10 +109,19 @@ class DeepDreamHandler:
             print("Layer must be int")
             return 0
         if (values['--{:s}_filter--'.format(PREFIX)]).isnumeric():
-            self.filter = int((values['--{:s}_filter--'.format(PREFIX)]))
+            self.filter = slice(int((values['--{:s}_filter--'.format(PREFIX)])),
+                                int((values['--{:s}_filter--'.format(PREFIX)])) + 1)
         else:
-            print("Layer must be int")
-            return 0
+            try:
+                _start,_stop = values['--{:s}_filter--'.format(PREFIX)].split(',')
+                if _start.isnumeric() and _stop.isnumeric():
+                    self.filter = slice(int(_start),int(_stop))
+                else:
+                    print("Filters must be int")
+                    return 0
+            except:
+                print("Insert a number(int) or a range(int,int) as filter!")
+                return 0
         # </editor-fold>
         # <editor-fold desc="Learning rate">
         self.learning_rate = float((values['--{:s}_learning_rate--'.format(PREFIX)]))
@@ -132,7 +141,6 @@ class DeepDreamHandler:
         if self.input_filename == "":
             print('Select an input image')
             return 0
-
         self.dd = DeepDream()
         self.dd.LoadParam(self.input_filename, self.image_size, self.epoch,
                        self.pyramid_depth, self.pyramid_mul, self.learning_rate, self.optimizer,

@@ -104,23 +104,29 @@ class FilterVisualization(Thread):
             if self.layer - 1 == i:
                 print("____ TARGET LAYER AFTER LAYER " + str(i) + ": " + str(list(self.model.modules())[i]))
                 _target = self.model(self.input_image).detach()
-                if self.filter-1 > _target.size()[1]:
-                    logging.error("Target representation has only {:d} filter, "
-                                  "but you selected filter number {:d}".format(_target.size()[1], self.filter))
+                if _target.size()[1] < self.filter.start:
+                    print("Selected layer has only {:d} filters! Not {:d}".format(_target.size()[1], self.filter.start))
                     return False
-                self.target_representation_level = TargetRepresentationLevel(filter_selected=self.filter-1)
-                self.model.add_module("layer_" + str(i + 1), self.target_representation_level)
+                if _target.size()[1] < self.filter.stop -1:
+                    print("Selected layer has only {:d} filters! Not {:d}".format(_target.size()[1], self.filter.stop))
+                    return False
+                self.target_representation_level = TargetRepresentationLevel(filter_selected=slice(
+                    self.filter.start - 1,
+                    self.filter.stop - 1))
+                self.model.add_module("final_layer", self.target_representation_level)
                 break
 
         if self.layer == 0:
             _target = self.model(self.input_image).detach()
-            if self.filter-1 > _target.size()[1]:
-                logging.error("Target representation has only {:d} filter, "
-                              "but you selected filter number {:d}".format(_target.size()[1], self.filter))
+            if _target.size()[1] < self.filter.start:
+                print("Selected layer has only {:d} filters! Not {:d}".format(_target.size()[1], self.filter.start))
                 return False
-
-            self.target_representation_level = TargetRepresentationLevel(filter_selected=self.filter-1)
-            self.model.add_module("layer_" + str(i + 1), self.target_representation_level)
+            if _target.size()[1] < self.filter.stop -1:
+                print("Selected layer has only {:d} filters! Not {:d}".format(_target.size()[1], self.filter.stop))
+                return False
+            self.target_representation_level = TargetRepresentationLevel(filter_selected=slice(self.filter.start -1,
+                                                                                                        self.filter.stop -1))
+            self.model.add_module("final_layer", self.target_representation_level)
 
         self.model.requires_grad_(False)
         return True
@@ -141,10 +147,7 @@ class FilterVisualization(Thread):
                 self.progress_bar.update(i*100/self.epoch)
             current_output = self.model(self.input_image)
 
-            if self.layer == 0:
-                current_rep = current_output
-            else:
-                current_rep = self.target_representation_level.currentRep
+            current_rep = self.target_representation_level.currentRep
 
             self.loss = -torch.mean(current_rep)
 
@@ -189,7 +192,7 @@ class TargetRepresentationLevel(nn.Module):
         self.filterSelected = filter_selected
 
     def forward(self, image):
-        if self.filterSelected != 0:
+        if self.filterSelected.start != -1:
             self.currentRep = image[0, self.filterSelected, :, :]
         else:
             self.currentRep = image
