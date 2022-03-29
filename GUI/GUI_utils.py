@@ -1,6 +1,7 @@
 import PIL
 import PySimpleGUI as sg
-from nn_utils import *
+import nn_utils
+import torch
 from PIL import Image
 import copy
 import io
@@ -113,7 +114,7 @@ def GetNetLayer(prefix,getFrameOnly=False):
 
     frame = sg.Frame(title="Pretrained Net", layout=[
         [sg.Radio('VGG16', 'model',size=(12, 1), key=key1), sg.Radio('VGG19', 'model',size=(12, 12), key=key2)],
-        [sg.Text("Layer (0 = output)", justification='l', expand_x=True),sg.Text("Filter (0 = all)", justification='r', expand_x=True)],
+        [sg.Text("Layer (0 = output)", justification='l', expand_x=True),sg.Text("Filter (0 = all)\nRange: [int,int[", justification='r', expand_x=True)],
         [sg.Input(key=key3, justification='l',expand_x=True), sg.Input(key=key4,justification='l',expand_x=True)],
     ], expand_x=True)
 
@@ -163,7 +164,7 @@ def OpenImage(file_or_bytes, resize=None, rand = False):
     :rtype: (bytes)
     '''
     if rand:
-        img = GetImageFromTensor(torch.rand([3,resize[0],resize[1]]))
+        img = nn_utils.GetImageFromTensor(torch.rand([3,resize[0],resize[1]]))
         bio = io.BytesIO()
         img.save(bio, format="PNG")
         del img
@@ -191,7 +192,7 @@ def OpenImage(file_or_bytes, resize=None, rand = False):
 def PrintOnOutputFrame(tensor, sgImage):
     if sgImage is not None:
         bio = io.BytesIO()
-        img = GetImageFromTensor(tensor).save(bio, format="PNG")
+        img = nn_utils.GetImageFromTensor(tensor).save(bio, format="PNG")
         del img
         sgImage.update(data=OpenImage(bio.getvalue(), (220, 220)), size =(220,220))  #GUI.GUI_utils.OpenImage(bio.getvalue(), (220, 220))
 

@@ -12,7 +12,10 @@ PREFIX = "IR"
 
 # Parameter needed for GUI
 ou_img = sg.Image()
-description = 'La rappresentazione inversa mira a migliorare\n una immagine input per matchare\n un output target dato'
+description = 'La rappresentazione inversa mira a migliorare\n' \
+              ' una immagine input per matchare\n' \
+              ' un output target dato\n' \
+              ' loss: mse(current_rep, target_rep) + regularise'
 
 layout = []
 frame = sg.Frame(title="Parameters", layout=[

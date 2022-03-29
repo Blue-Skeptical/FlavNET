@@ -27,7 +27,7 @@ frame_preview = sg.Frame(title="I/O", layout=[
     [sg.Frame(title='Output image', vertical_alignment='t', layout=[[ou_img]], size=(220, 220))]
 ], vertical_alignment='t')
 
-frame_logo = GetLogoAndDescription(getFrameOnly=True, description='FILTER VISUALIZATION DESCRIPTION')
+frame_logo = GetLogoAndDescription(getFrameOnly=True, description='loss: -mean(current_rep)')
 
 frame_logo_parameters = sg.Frame(title='', border_width=0, layout=[
     [frame_logo],
