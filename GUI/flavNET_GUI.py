@@ -12,7 +12,7 @@ t2 = DD.layout  #Deep Dream
 
 t3 = FV.layout  #Filter Visualization
 
-console = sg.Output(size=(95,3), key = '--OUTPUT--', expand_x=True)
+console = sg.Output(size=(78,3), key = '--OUTPUT--', expand_x=True)
 progress_bar = sg.ProgressBar(max_value=100,orientation='h',key='--PROGRESSBAR--',expand_x=True,size=(40,8),bar_color=("green",FN_MAIN_COLOUR))
 
 layout = [
@@ -32,7 +32,7 @@ layout = [
     ], expand_x=True)]
 ]
 
-window = sg.Window('FlavNET', layout, default_element_size=(12,1),icon='../logo.png')
+window = sg.Window('FlavNET', layout, default_element_size=(12,1),icon='../logo.ico')
 
 while True:
     event, values = window.read()

@@ -12,10 +12,9 @@ PREFIX = "IR"
 
 # Parameter needed for GUI
 ou_img = sg.Image()
-description = 'La rappresentazione inversa mira a migliorare\n' \
-              ' una immagine input per matchare\n' \
-              ' un output target dato\n' \
-              ' loss: mse(current_rep, target_rep) + regularise'
+description = 'Given an target image output, try to generate an \n' \
+              ' input image that matches as close as possible\n' \
+              ' the desired output.' \
 
 layout = []
 frame = sg.Frame(title="Parameters", layout=[
@@ -171,5 +170,3 @@ class InverseRepresentatorHandler:
         self.ir.start()
 
 inverseRepresentatorHandler = InverseRepresentatorHandler()
-
-#sg.Frame(title='Source image',vertical_alignment='t', layout=[[sg.Image(OpenImage('../images/gatto.jpg', resize=(200,200)))]])
