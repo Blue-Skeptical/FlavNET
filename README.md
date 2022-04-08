@@ -44,10 +44,11 @@ cd GUI/
 python3 flavNET_GUI.py
 ```
 
-*Warning:*
-*Generated images will be saved inside /GUI/generated/ folder, make sure to have such folder in the correct place*
+*Warnings:*
+- *Generated images will be saved inside /GUI/generated/ folder, make sure to have such folder in the correct place*
+- *Provide only .jpg or .jpeg*
 
-#Inverse Representation
+# Inverse Representation
 During __inverse representation__, a target image is used to produce an output. Such output is our target output.<br />
 Selected network is fed with an input image. During each step, this input image is optimized to make its output match our target output. <br />
 The result should be something colse to our initial target image.<br />
@@ -63,7 +64,7 @@ _Thanks for nabster the [image](https://pixabay.com/de/photos/tier-hirsch-tiere-
 <br />
 ![inverse_representation](./guide_images/inverse_representation.png)
 
-#Filter Visualization
+# Filter Visualization
 Using a different loss function we get a filter visualizator. During __filter visualization__, we feed our network with a noise and optimize the input image over the output of a specific layer. <br />
 Lower layers' filters show basic colours and patterns. Going toward the network's output we get more complex filters. <br />
 Our loss function will be: <br />
@@ -73,7 +74,7 @@ Our loss function will be: <br />
 Here some examples: <br />
 ![filter_visualization](./guide_images/filter_visualization.png)
 
-#Deep Dream
+# Deep Dream
 If, in filter visualization, we use a real image rather than a random noise, we get a deep dream.
 During __deep dreaming__, for artistic reasons, we also use a technique called _pyramid image_.
 This technique consists in feeding the network with a different scaled versions of the input image. This way, our network can _dream_ a "global" feature (the ratio between the receptive field and the input image changes). As the size increase, the _dreamed_ features are generated in a more local context.<br />
