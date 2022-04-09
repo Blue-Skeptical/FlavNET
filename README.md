@@ -85,6 +85,7 @@ Here some examples: <br />
 <br />
 ![DD_2](./guide_images/DD_2.png)
 <br />
+⚠️⚠️ **<ins> WE RECOMMEND NOT TO MAKE DEEP DREAM WITH PEOPLE'S FACES AFTER 11 pm </ins>** ⚠️⚠️
 # ... for more:
 Follow FlavNET on [instagram](https://www.instagram.com/flavnet/)! <br />
 ![Instagram](./guide_images/Instagram-logo_a.png)
