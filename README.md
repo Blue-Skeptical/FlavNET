@@ -60,7 +60,7 @@ mse_loss(layer_output, target_output) + regularise
 ```
 
 Here some examples:<br />
-_Thanks for nabster the [image](https://pixabay.com/de/photos/tier-hirsch-tiere-s%c3%a4ugetier-gut-985126/)_
+_Thanks nabster the [image](https://pixabay.com/de/photos/tier-hirsch-tiere-s%c3%a4ugetier-gut-985126/)_
 <br />
 ![inverse_representation](./guide_images/inverse_representation.png)
 
