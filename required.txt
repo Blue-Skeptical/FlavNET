@@ -1,0 +1,4 @@
+PySimpleGUI
+torch
+matplotlib
+torchvision
