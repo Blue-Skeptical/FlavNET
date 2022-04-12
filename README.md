@@ -3,7 +3,7 @@
 
 ![LOGO](./logo.png)
 
-FlavNET provides tools to unmask, visualize and understand the deepest secrets neural network.<br /><br />
+FlavNET provides tools to unmask, visualize and understand the deepest secrets of neural networks.<br /><br />
 FlavNET has been developed as a project for:<br />
 [_**School in AI: Deep Learning, Vision and Language for Industry**_](https://aischools.it/)  
 by Jacopo Rizzi and Fabio Andreghetti.
@@ -70,7 +70,7 @@ Using a different loss function we get a filter visualizator. During __filter vi
 Lower layers' filters show basic colours and patterns. Going toward the network's output we get more complex filters. <br />
 Our loss function will be: <br />
 ```
--mean(layer_output) <br />
+-mean(layer_output)
 ```
 Here some examples: <br />
 ![filter_visualization](./guide_images/filter_visualization.png)
