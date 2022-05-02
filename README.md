@@ -52,7 +52,7 @@ python3 flavNET_GUI.py
 ## Inverse Representation
 During __inverse representation__, a target image is used to produce an output. Such output is our target output.<br />
 Selected network is fed with an input image. During each step, this input image is optimized to make its output match our target output. <br />
-The result should be something colse to our initial target image.<br />
+The result should be something close to our initial target image.<br />
 Levels with high index (close to the network's end) are more difficult to be inverted, hence the output image will be noisy.
 Levels with low index (close to the network's begin) are less difficult to be inverted, the output image will be almost the same as the input image. <br />
 Our loss function will be:
@@ -79,7 +79,7 @@ Here some examples: <br />
 If, in filter visualization, we use a real image rather than a random noise, we get a deep dream.
 During __deep dreaming__, for artistic reasons, we also use a technique called _pyramid image_.
 This technique consists in feeding the network with a different scaled versions of the input image. This way, our network can _dream_ a "global" feature (the ratio between the receptive field and the input image changes). As the size increase, the _dreamed_ features are generated in a more local context.<br />
-Deep dreaming is very dependents to the network used. <br />
+Deep dreaming is very dependent to the network used. <br />
 Here some examples: <br />
 ![DD_1](./guide_images/DD_1.png)
 <br />
